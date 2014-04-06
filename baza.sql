@@ -4,6 +4,7 @@ UserID INTEGER NOT NULL,
 Login VARCHAR(100),
 Password VARCHAR(100),
 
+Somersaults INTEGER, --HEHE ilość robionych salt spadając z 10 piętra
 FirstName VARCHAR(100),
 LastName VARCHAR(150),
 Email VARCHAR(100),
