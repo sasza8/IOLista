@@ -1,0 +1,40 @@
+CREATE TABLE Users
+(
+UserID INTEGER NOT NULL,
+Login VARCHAR(100),
+Password VARCHAR(100),
+
+FirstName VARCHAR(100),
+LastName VARCHAR(150),
+Email VARCHAR(100),
+
+PRIMARY KEY (UserID)
+);
+
+
+CREATE TABLE Tasks
+(
+TaskID BIGINT UNSIGNED NOT NULL,
+
+Description Text,
+Owner INTEGER NOT NULL,
+
+Done BIT NOT NULL,
+CreatedOn SMALLDATETIME NOT NULL,
+LastChange SMALLDATETIME NOT NULL,
+
+PRIMARY KEY (TaskID),
+FOREIGN KEY (Owner) REFERENCES Users (UserID)
+);
+
+
+CREATE TABLE Have_access
+(
+TaskID BIGINT UNSIGNED NOT NULL,
+UserID INTEGER NOT NULL,
+Permissions INTEGER UNNSIGNED NOT NULL, --maska bitowa zawierajaca uprawnienia
+
+FOREIGN KEY (TaskID) REFERENCES Tasks (TaskID),
+FOREIGN KEY (Owner) REFERENCES Users (UserID)
+);
+
