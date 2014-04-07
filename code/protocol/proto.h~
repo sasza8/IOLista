@@ -1,0 +1,14 @@
+#ifndef _PROTO_H_
+#define _PROTO_H_
+
+
+// typy pakietów przesyłane pomiędzy serwerem a klientem
+// każdy pakiet musi się zaczynać typem
+// CTS - pakiet przesylany od klienta do serwera
+// STC - na odwrot
+
+const unsigned CTS_USERNAME = 0x01; // nazwa uzytkownika, string nullterminated
+const unsigned STC_SALT = 0x02; // salt, string nullterminated
+const unsigned CTS_PASSWORDHASH = 0x03; // hash hasla, string nullterminated
+
+#endif
