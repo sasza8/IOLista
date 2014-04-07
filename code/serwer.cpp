@@ -9,16 +9,17 @@
 #include <unistd.h>
 using namespace std;
 
-#include "server.h"
+#include "serwer.h"
 
 #include "err.h"
 
-void serverClient(Server server, int sock)
+void serverClient(Server *server, int sock)
 {
+	
 	close(sock);
 }
 
-void Server::listen()
+void Server::Listen()
 {
 	const int PORT_NUM = 16661; // pracujemy na fajnym porcie kse
 
@@ -56,7 +57,7 @@ void Server::listen()
 		if (clientSock < 0)
 			syserr("accept");
 		
-		thread(serverClient, clientSock).detach();
+		thread(serverClient, this, clientSock).detach();
 	}
 	
 
