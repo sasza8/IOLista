@@ -1,37 +1,27 @@
 CREATE TABLE List_node
 (
-ID BIGINT UNSIGNED NOT NULL,
-Val BIGINT NOT NULL,
-NextNd BIGINT UNSIGNED,
-
-PRIMARY KEY (ID),
-FOREIGN KEY (NextNd) REFERENCES List_node (ID)
+ID INTEGER PRIMARY KEY,
+Val INTEGER NOT NULL,
+NextNd INTEGER --to ma byc referencja na List_node jak ktos potrafi zrobic lepsza liste niech powie :P
 );
 
 CREATE TABLE List
 (
-ID BIGINT UNSIGNED NOT NULL,
-ListFirst BIGINT UNSIGNED,
-ListLast BIGINT UNSIGNED,
-
-PRIMARY KEY (ID),
-FOREIGN KEY (ListFirst) REFERENCES List_node (ID),
-FOREIGN KEY (ListLast) REFERENCES List_node (ID)
-)
+ID INTEGER PRIMARY KEY,
+ListFirst INTEGER REFERENCES List_node,
+ListLast INTEGER REFERENCES List_node
+);
 
 
 CREATE TABLE Users
 (
-UserID INTEGER NOT NULL,
-Login VARCHAR(100),
-Password VARCHAR(100),
-Salt VARCHAR(100),
-
-FirstName VARCHAR(100),
-LastName VARCHAR(150),
-Email VARCHAR(100),
-
-PRIMARY KEY (UserID)
+UserID INTEGER PRIMARY KEY,
+Login VARCHAR2(100),
+Password VARCHAR2(100),
+Salt VARCHAR2(100),
+FirstName VARCHAR2(100),
+LastName VARCHAR2(150),
+Email VARCHAR2(100)
 );
 
 
@@ -42,21 +32,14 @@ CREATE TABLE Tasks
 -- oraz wziac ojca, zmniejszyc mu ChildCounter, jesli ten spadnie do 0 to zakonczyc
 -- dodawanie powiazania oczywiscie musi zwiększać ChildCounter
 -- aktualizacja podzadania musi przejsc na sama gore drzewa i zaktualizowac czas zmiany
-TaskID BIGINT UNSIGNED NOT NULL,
-
-Description TEXT,
-Owner INTEGER NOT NULL,
-
-AncListID INTEGER NOT NULL, --pierwszy jest najstaszy przodek
-
+TaskID INTEGER PRIMARY KEY,
+Description VARCHAR2(4000),
+Owner INTEGER REFERENCES Users,
+AncListID INTEGER NOT NULL REFERENCES List, --pierwszy jest najstaszy przodek
 ChildCounter Integer Not NULL, --TODEL? zawiera liczbe niezakonczonych synow tego zadania
-Done BIT NOT NULL,
-CreatedOn SMALLDATETIME NOT NULL,
-LastChange SMALLDATETIME NOT NULL,
-
-PRIMARY KEY (TaskID),
-FOREIGN KEY (Owner) REFERENCES Users (UserID),
-FOREIGN KEY (AncListID) REFERENCES List (ID)
+Done INTEGER NOT NULL, --TODO poprawic typ
+CreatedOn DATE NOT NULL,
+LastChange DATE NOT NULL
 );
 
 
@@ -64,9 +47,10 @@ FOREIGN KEY (AncListID) REFERENCES List (ID)
 
 CREATE TABLE Have_access
 (
-TaskID BIGINT UNSIGNED NOT NULL,
-UserID INTEGER NOT NULL,
-Permissions INTEGER UNNSIGNED NOT NULL, --maska bitowa zawierajaca uprawnienia
+TaskID INTEGER REFERENCES Tasks,
+UserID INTEGER REFERENCES Users,
+Permissions INTEGER NOT NULL --maska bitowa zawierajaca uprawnienia
+/*
 -- & 1  - moze zobaczyc
 -- & 2  - moze oznaczyc jako zakonczone
 -- & 4  - moze zmienic opis
@@ -74,7 +58,5 @@ Permissions INTEGER UNNSIGNED NOT NULL, --maska bitowa zawierajaca uprawnienia
 -- & 16 - moze dac prawo do zakonczenia
 -- & 32 - moze dac prawo do zmiany opisu
 -- & 64 - moze usunac zadanie
-
-FOREIGN KEY (TaskID) REFERENCES Sub_tasks (SubTaskID),
-FOREIGN KEY (Owner) REFERENCES Users (UserID)
+*/
 );
