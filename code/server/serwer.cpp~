@@ -11,12 +11,11 @@ using namespace std;
 
 #include "serwer.h"
 
-#include "err.h"
-
-void serverClient(Server *server, int sock)
+void Server::serveClient(int sock)
 {
-	
-	close(sock);
+	Client client(sock);
+	if(loginClient(client) == false)
+		return;
 }
 
 void Server::Listen()
@@ -29,10 +28,8 @@ void Server::Listen()
 	// otwieramy gniazdo
 	int serverSock = socket(PF_INET, SOCK_STREAM, 0); // creating IPv4 TCP socket
 	int yes = 1;
-	if (setsockopt(serverSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0)
-		syserr("setsockopt");
-	if (serverSock < 0)
-		syserr("socket");
+	if (setsockopt(serverSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0);
+	if (serverSock < 0);
 	// after socket() call; we should close(sock) on any execution path;
 	// since all execution paths exit immediately, sock would be closed when program terminates
 
@@ -41,12 +38,10 @@ void Server::Listen()
 	server_address.sin_port = htons(PORT_NUM); // listening on port PORT_NUM
 
 	// laczymy socket z portem i addressem naszym
-	if (bind(serverSock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
-		syserr("bind");
+	if (bind(serverSock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0);
 
 	// nasluchujemy! chujemy!
-	if (listen(serverSock, 0) < 0)
-		syserr("listen");
+	if (listen(serverSock, 0) < 0);
 
 	while(true)
 	{
@@ -54,11 +49,17 @@ void Server::Listen()
 		// pobieramy polaczenie z sock! na nowym msg_sock to trzymamy
 		int clientSock = accept(serverSock, (struct sockaddr *) &client_address, &client_address_len);
 		
-		if (clientSock < 0)
-			syserr("accept");
+		if (clientSock < 0);
 		
-		thread(serverClient, this, clientSock).detach();
+		thread( [&]()->void{ this->serveClient(clientSock); } ).detach();
 	}
 	
 
+}
+
+bool Server::loginClient(Client client)
+{
+	//string login = client.getLogin();
+	//int salt = getSaltOfUser(login);
+	//string hash = client.getPasswordHash(salt);
 }

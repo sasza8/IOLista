@@ -11,10 +11,11 @@ using namespace std;
 
 #include "serwer.h"
 
-void serverClient(Server *server, int sock)
+void Server::serveClient(int sock)
 {
-	
-	close(sock);
+	Client client(sock);
+	if(loginClient(client) == false)
+		return;
 }
 
 void Server::Listen()
@@ -50,8 +51,15 @@ void Server::Listen()
 		
 		if (clientSock < 0);
 		
-		thread(serverClient, this, clientSock).detach();
+		thread( [&]()->void{ this->serveClient(clientSock); } ).detach();
 	}
 	
 
+}
+
+bool Server::loginClient(Client client)
+{
+	string login = client.getLogin();
+	int salt = getSaltOfUser(login);
+	string hash = client.getPasswordHash(salt);
 }
