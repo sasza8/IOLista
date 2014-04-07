@@ -51,7 +51,6 @@ int main(int argc, char *argv[])
       // TODO
       // Tutaj cos z klientami robic 
       // snd_len = write(msg_sock, buffer, len);
-      }
     } while (len > 0);
     printf("ending connection\n");
     if (close(msg_sock) < 0)
