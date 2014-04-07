@@ -10,12 +10,31 @@
 using namespace std;
 
 #include "serwer.h"
+#include "protocol/proto.h"
 
 void Server::serveClient(int sock)
 {
 	Client client(sock);
-	if(loginClient(client) == false)
-		return;
+	int type = client.getType();
+	switch(type)
+	{
+		case CTS_LOGIN:
+			if(loginClient(client) == false)
+				return;
+			break;
+		case CTS_REGISTER:
+			// rejestracje
+			return;
+			break;
+		default:
+			// wysylamy info o bledzie
+			return;
+	}
+}
+
+string Server::getSaltOfUser(string username)
+{
+	return "";
 }
 
 void Server::Listen()
@@ -59,7 +78,7 @@ void Server::Listen()
 
 bool Server::loginClient(Client client)
 {
-	string login = client.getLogin();
-	int salt = getSaltOfUser(login);
+	string username = client.getUsername();
+	int salt = getSaltOfUser(username);
 	string hash = client.getPasswordHash(salt);
 }

@@ -6,6 +6,7 @@
 class Server
 {
 	void serveClient(int sock);
+	string getSaltOfUser();
 public:
 	void Listen();
 	bool loginClient(Client client);

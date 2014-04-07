@@ -10,6 +10,7 @@
 using namespace std;
 
 #include "serwer.h"
+#include "protocol/proto.h"
 
 void Server::serveClient(int sock)
 {
@@ -29,6 +30,11 @@ void Server::serveClient(int sock)
 			// wysylamy info o bledzie
 			return;
 	}
+}
+
+string Server::getSaltOfUser(string username)
+{
+	return "";
 }
 
 void Server::Listen()
@@ -73,6 +79,6 @@ void Server::Listen()
 bool Server::loginClient(Client client)
 {
 	string username = client.getUsername();
-	int salt = getSaltOfUser(login);
+	string salt = getSaltOfUser(username);
 	string hash = client.getPasswordHash(salt);
 }

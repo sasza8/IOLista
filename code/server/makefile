@@ -1,8 +1,9 @@
 TARGET: Serwer
 
 CC=g++
-CFLAGS=-Wall -O2 -std=c++11 -lpthread
-LFLAGS=-Wall -std=c++11 -lpthread
+FLAGS=-std=c++11 -lpthread -I..
+CFLAGS=-Wall -O2 $(FLAGS)
+LFLAGS=-Wall $(FLAGS)
 OBJS = main.o serwer.o client.o
 
 Serwer: $(OBJS)
