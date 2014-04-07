@@ -1,62 +1,63 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <stdio.h>
-#include <string.h>
+
+#include <iostream>
+#include <thread>
+#include <cstdio>
+#include <cstring>
 #include <unistd.h>
+using namespace std;
+
+#include "server.h"
 
 #include "err.h"
 
-#define BUFFER_SIZE   1000
-#define QUEUE_LENGTH     5
-#define PORT_NUM     16661 // pracujemy na fajnym porcie kse
-
-int main(int argc, char *argv[])
+void serverClient(Server server, int sock)
 {
-  int sock, msg_sock;
-  struct sockaddr_in server_address;
-  struct sockaddr_in client_address;
-  socklen_t client_address_len;
-  
-  char buffer[BUFFER_SIZE];
-  ssize_t len, snd_len;
+	close(sock);
+}
 
-  // otwieramy gniazdo
-  sock = socket(PF_INET, SOCK_STREAM, 0); // creating IPv4 TCP socket
-  if (sock <0)
-    syserr("socket");
-  // after socket() call; we should close(sock) on any execution path;
-  // since all execution paths exit immediately, sock would be closed when program terminates
+void Server::listen()
+{
+	const int PORT_NUM = 16661; // pracujemy na fajnym porcie kse
 
-  server_address.sin_family = AF_INET; // IPv4
-  server_address.sin_addr.s_addr = htonl(INADDR_ANY); // listening on all interfaces
-  server_address.sin_port = htons(PORT_NUM); // listening on port PORT_NUM
+	struct sockaddr_in server_address;
+	struct sockaddr_in client_address;
 
-  // laczymy socket z portem i addressem naszym
-  if (bind(sock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
-    syserr("bind");
+	// otwieramy gniazdo
+	int serverSock = socket(PF_INET, SOCK_STREAM, 0); // creating IPv4 TCP socket
+	int yes = 1;
+	if (setsockopt(serverSock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) < 0)
+		syserr("setsockopt");
+	if (serverSock < 0)
+		syserr("socket");
+	// after socket() call; we should close(sock) on any execution path;
+	// since all execution paths exit immediately, sock would be closed when program terminates
 
-  // nasluchujemy! chujemy!
-  if (listen(sock, QUEUE_LENGTH) < 0)
-    syserr("listen");
+	server_address.sin_family = AF_INET; // IPv4
+	server_address.sin_addr.s_addr = htonl(INADDR_ANY); // listening on all interfaces
+	server_address.sin_port = htons(PORT_NUM); // listening on port PORT_NUM
 
-  for (;;) {
-    client_address_len = sizeof(client_address);
-    // pobieramy polaczenie z sock! na nowym msg_sock to trzymamy
-    msg_sock = accept(sock, (struct sockaddr *) &client_address, &client_address_len);
-    if (msg_sock < 0)
-      syserr("accept");
-    do {
-      len = read(msg_sock, buffer, sizeof(buffer));
-      // TODO
-      // Tutaj cos z klientami robic 
-      // snd_len = write(msg_sock, buffer, len);
-      }
-    } while (len > 0);
-    printf("ending connection\n");
-    if (close(msg_sock) < 0)
-      syserr("close");
-  }
-  
-  return 0;
+	// laczymy socket z portem i addressem naszym
+	if (bind(serverSock, (struct sockaddr *) &server_address, sizeof(server_address)) < 0)
+		syserr("bind");
+
+	// nasluchujemy! chujemy!
+	if (listen(serverSock, 0) < 0)
+		syserr("listen");
+
+	while(true)
+	{
+		socklen_t client_address_len = sizeof(client_address);
+		// pobieramy polaczenie z sock! na nowym msg_sock to trzymamy
+		int clientSock = accept(serverSock, (struct sockaddr *) &client_address, &client_address_len);
+		
+		if (clientSock < 0)
+			syserr("accept");
+		
+		thread(serverClient, clientSock).detach();
+	}
+	
+
 }
