@@ -59,7 +59,7 @@ void Server::Listen()
 
 bool Server::loginClient(Client client)
 {
-	//string login = client.getLogin();
-	//int salt = getSaltOfUser(login);
-	//string hash = client.getPasswordHash(salt);
+	string login = client.getLogin();
+	int salt = getSaltOfUser(login);
+	string hash = client.getPasswordHash(salt);
 }

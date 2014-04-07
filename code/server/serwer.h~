@@ -5,7 +5,7 @@
 
 class Server
 {
-	void serverClient(int sock);
+	void serveClient(int sock);
 public:
 	void Listen();
 	bool loginClient(Client client);

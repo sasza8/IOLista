@@ -14,8 +14,21 @@ using namespace std;
 void Server::serveClient(int sock)
 {
 	Client client(sock);
-	if(loginClient(client) == false)
-		return;
+	int type = client.getType();
+	switch(type)
+	{
+		case CTS_LOGIN:
+			if(loginClient(client) == false)
+				return;
+			break;
+		case CTS_REGISTER:
+			// rejestracje
+			return;
+			break;
+		default:
+			// wysylamy info o bledzie
+			return;
+	}
 }
 
 void Server::Listen()
@@ -59,7 +72,7 @@ void Server::Listen()
 
 bool Server::loginClient(Client client)
 {
-	string login = client.getLogin();
+	string username = client.getUsername();
 	int salt = getSaltOfUser(login);
 	string hash = client.getPasswordHash(salt);
 }
