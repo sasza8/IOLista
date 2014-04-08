@@ -13,25 +13,26 @@ Client::~Client()
 	close(sock);
 }
 
-string Client::getUsername()
+cts_login_details Client::getLoginDetails()
 {
-	char buffer[200];
-	int len = recv(sock, buffer, sizeof(buffer)-1, 0);
-	buffer[len] = '\0';
-	return string(buffer);
+	cts_login_details details;
+	recv(sock, &details, sizeof(details), 0);
+	return details;
 }
 
-string Client::getPasswordHash(string salt)
+void Client::loginOK()
 {
-	send(sock, salt.c_str(), salt.length(), 0);
-	unsigned type;
-	recv(sock, &type, sizeof(type), 0);
-	if(type != CTS_PASSWORDHASH);
-		// rzucamy wyjątek!
-	char buffer[200];
-	int len = recv(sock, buffer, sizeof(buffer)-1, 0);
-	buffer[len] = '\0';
-	return string(buffer);
+	sendType(STC_LOGIN_OK);
+}
+
+void Client::registerOK()
+{
+	sendType(STC_REGISTER_OK);
+}
+
+void Client::sendType(unsigned type)
+{
+	send(sock, &type, sizeof(type), 0);
 }
 
 int Client::getType()

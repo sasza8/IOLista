@@ -8,10 +8,11 @@ class Client
 {
 	int sock;
 public:
-	string getUsername();
-	string getPasswordHash(string salt); // przesyla klientowi salta i odbiera od niego hash
+	cts_login_details getLoginDetails();
+	void loginOK();
+	void registerOK();
+	void sendType(unsigned type);
 	int getType(); // odbiera od klienta sam typ pakietu
-	
 	
 	Client(int sock);
 	~Client();

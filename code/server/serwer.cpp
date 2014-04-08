@@ -23,7 +23,7 @@ void Server::serveClient(int sock)
 				return;
 			break;
 		case CTS_REGISTER:
-			// rejestracje
+			registerClient(client);
 			return;
 			break;
 		default:
@@ -78,7 +78,15 @@ void Server::Listen()
 
 bool Server::loginClient(Client client)
 {
-	string username = client.getUsername();
-	string salt = getSaltOfUser(username);
-	string hash = client.getPasswordHash(salt);
+	cts_login_details loginDetails = client.getLoginDetails();
+	// szukamy usera w bazie
+	client.loginOK();
 }
+
+bool Server::registerClient(Client client)
+{
+	cts_register_details registerDetails = client.getRegisterDetails();
+	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
+	client.registerOK();
+}
+

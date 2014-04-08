@@ -7,8 +7,20 @@
 // CTS - pakiet przesylany od klienta do serwera
 // STC - na odwrot
 
-const unsigned CTS_USERNAME = 0x01; // nazwa uzytkownika, string nullterminated
-const unsigned STC_SALT = 0x02; // salt, string nullterminated
-const unsigned CTS_PASSWORDHASH = 0x03; // hash hasla, string nullterminated
+const unsigned CTS_LOGIN = 0x01; // sygnalizacja logowania, pusty pakiet
+const unsigned CTS_LOGIN_DETAILS = 0x02; // nazwa uzytkownika i haslo
+struct cts_login_details
+{
+	char username[200];
+	char password[200];
+}
+
+const unsigned STC_LOGINOK = 0x03;
+const unsigned STC_LOGINFAILED = 0x04;
+
+const unsigned CTS_REGISTER = 0x1001; // sygnalizacja rejestracji nowego uzytkownika
+const unsigned CTS_REGISTER_DETAILS = 0x1002; // szczegoly rejestracji
+
+const unsigned 
 
 #endif
