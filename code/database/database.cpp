@@ -220,6 +220,7 @@ std::vector<ListDatabase::ListTask> ListDatabase::getLists(UserID_t user_id)
 	if(user_id != -1)
 		if(user_id >= 0)
 		{
+			printf("pobieram\n");
 			open();
 			char *zErrMsg = 0;
 			int rc;
@@ -230,7 +231,6 @@ std::vector<ListDatabase::ListTask> ListDatabase::getLists(UserID_t user_id)
 			
 			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)&to_ret, &zErrMsg);
 			oss.clear();
-			
 			
 			
 			close();

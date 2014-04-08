@@ -101,6 +101,7 @@ void Client::startSendingTasks(int number)
 
 void Client::sendTask(ListDatabase::ListTask task)
 {
+	sendType(STC_TASK);
 	stc_task details;
 	details.id = task.id;
 	strncpy(details.description, task.description.c_str(), sizeof(details.description)-1);

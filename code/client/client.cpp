@@ -93,22 +93,21 @@ void wyswietl_pomocnicza(const int sock, int number) {
 	unsigned int temp;
 	// wyswietlamy zadania
 	for( int i = 0 ; i < number ; i++ ){
-		do{ // czekamy na pakiet STC_TASK
-			printf("Probuje pobrac STC_TASK\n");
-			recv(sock, &temp, sizeof(temp), 0);
-		} while (temp != STC_TASK);
+		printf("Probuje pobrac STC_TASK\n");
+		printf("%d\n", recv(sock, &temp, sizeof(temp), 0));
+		if (temp != STC_TASK) { printf("%x\n", temp); assert(false); }
 		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
 		// id na 0, name na FAIL albo cos takiego
 		printf("ID: %d\n"
 				"DESCRIPTION: %s\n"
-				"OWNER: %s\n"
+				"OWNER: N/A\n"
 				"DONE: %s\n"
 				"CREATEDON: %d\n"
 				"LASTCHANGE: %d\n",
 				task.id,
 				task.description,
-				task.owner,
+				//task.owner,
 				task.done ? "true" : "false",
 				task.createdon,
 				task.lastchange
@@ -133,14 +132,14 @@ void wyswietl_zadania(const int sock) {
 	send(sock, &task_id, sizeof(task_id), 0);
 
 	// czekamy na odpowiedni pakiet i odbieramy ilosc zadan
-	do{ 
-		printf("Probuje pobrac STC_START_TASKS...\n");
-		recv(sock, &temp, sizeof(temp), 0);
-	} while (temp != STC_START_TASKS);
+	printf("Probuje pobrac STC_START_TASKS...\n");
+	recv(sock, &temp, sizeof(temp), 0);
+	if (temp != STC_START_TASKS) assert(false);
 	struct stc_start_tasks task_number;
 	recv(sock, &task_number, sizeof(task_number), 0);
 
 	// wyswietlamy zadania!
+	printf("%d zadan\n", task_number.number);
 	wyswietl_pomocnicza(sock, task_number.number);
 }
 

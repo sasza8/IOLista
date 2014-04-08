@@ -95,7 +95,7 @@ bool Server::loginClient(Client &client)
 		return false;
 	}
 	
-	//client.setUserDetails(dbUser);
+	client.setUserDetails(dbUser);
 	printf("Zalogowano uzytkownika %s\n", dbUser.login.c_str());
 	return true;
 	
@@ -112,32 +112,37 @@ bool Server::registerClient(Client &client)
 bool Server::addTask(Client &client)
 {
 	Client::TaskDetails taskDetails = client.getTaskDetails();
+	printf("user %d dodaje task\n", client.getID());
 	db.addTask(taskDetails.description, client.getID(), taskDetails.parent, false);
 	return true;
 }
 
 bool Server::getTasks(Client &client)
 {
+	printf("user %s (%d) pobiera zadanie\n", client.getUsername().c_str(), client.getID());
 	int parent = client.getTasksParent();
+	printf("user %s pobiera dzieci %d\n", client.getUsername().c_str(), parent);
 	vector < ListDatabase::ListTask > tasks;
 	if(parent == -1)
 		tasks = db.getLists(client.getID());
 	else
 		tasks = db.getSubTasksList(client.getID(), parent);
 	
+	printf("zaczynam wysylac %d zadan do usera %s\n", tasks.size(), client.getUsername().c_str());
 	client.startSendingTasks(tasks.size());
 	for(auto task : tasks)
+	{
+		printf("wysylam zadanie %s\n", task.description.c_str());
 		client.sendTask(task);
+	}
 }
 
 Server::Server() : db("testowa.db")
 {
-	db.open();
 }
 
 Server::~Server()
 {
-	db.close();
 }
 
 
