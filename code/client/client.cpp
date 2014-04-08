@@ -29,8 +29,6 @@ void zaloguj(int sock, const char *username, const char *pass){
 	send(sock, &temp, sizeof(temp), 0);
 }
 
-
-
 void test_user(const int sock, const char *username, const char *pass,
 		const unsigned odpowiedz_serwera) {
 
@@ -43,8 +41,7 @@ void test_user(const int sock, const char *username, const char *pass,
 	assert(odpowiedz==odpowiedz_serwera);
 }
 
-int conn()
-{
+int conn() {
 	int sock;
 
 	struct addrinfo addr_hints;
@@ -79,32 +76,40 @@ int conn()
 	return sock;
 }
 
-void wyswietl_listy(const int conn) {
-	// Wysylamy zadanie 
-	int tempsnd = CTS_GET_LISTS;
-	send(sock, &tempsnd, sizeof(tempsnd), 0);
-
+void wyswietl_listy(const int sock) {
 	int tempresp;
-	do{ // czekamy na pakiet CTS_LISTS_BEGIN
-		recv(sock, &tempresp, sizeof(tempresp), 0);
-	} while tempresp != CTS_LISTS_BEGIN;
 	int lists_number;
-	recv(sock, &lists_number, sizeof(lists_number), 0);
+	int tempsnd = CTS_GET_TASKS;
+	send(sock, &tempsnd, sizeof(tempsnd), 0); // CTS_GET_TASKS
+	recv(sock, &lists_number, sizeof(lists_number), 0); // ile list
 
 	for( int i = 0 ; i < lists_number ; i++ ){
-		do{ // czekamy na pakiet STC_LIST
+		do{ // czekamy na pakiet STC_TASK
 			recv(sock, &tempresp, sizeof(tempresp), 0);
-		} while tempresp != STC_LIST;
-		struct stc_list list;
+		} while tempresp != STC_TASK
+		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
 		// id na 0, name na FAIL albo cos takiego
-		recv(sock, &list, sizeof(list), 0);
-		printf("ID: %d, ZADANIE: %s\n", list.id, list.name);
+		printf("ID: %d\n"
+				"DESCRIPTION: %s\n"
+				"OWNER: %s\n"
+				"DONE: %s\n"
+				"CREATEDON: %d\n"
+				"LASTCHANGE: %d\n",
+				task.id,
+				task.description,
+				task.owner,
+				task.done ? "true" : "false",
+				task.createdon,
+				task.lastchange
+		);
+		printf("========================================\n");
 	}
 }
 
 void test_zaloguj() {
-	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo powtornie ---> nie udalpo sie zalogowac");
+	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo"
+		   "	powtornie ---> nie udalo sie zalogowac\n");
 	do{
 		printf("Prosze podac uzytkownika: ");
 		scanf("%s\n", user);
@@ -126,7 +131,36 @@ void test_komunikat_zalogowany(){
 	printf("	ctrl^c aby wyjsc z programu ;)\n");
 }
 
-void test_komendy() {
+void test_komunikat_dodaj_zadanie(){
+	printf("Aby dodac nowe zadanie trzeba podac 2 wartosci:\n"
+			"	ojciec - id ZADANIA, tworzone zadanie stanie sie "
+			"podzadaniem zadania z id ojciec ( wpisac -1 "
+			"gdy chcemy zeby zadanie nie bylo podzadaniem)\n"
+			"	opis - tekstowy opis zadania\n"
+	);
+}
+
+// Pobiera z wejscia dane i wysyla je do serwera z odpowiednim pakietem
+void dodaj_zadanie(const int sock) {
+	test_komunikat_dodaj_zadanie();
+	int parent_;
+	char description_[4000];
+	//TODO
+	printf("prosze podad id: ");
+	scanf("%d\n", &parent_);
+	printf("prosze podac opis: ");
+	scanf("%s\n", description_);
+
+	struct cts_add_task msg;
+	msg.parent = parent_;
+	strncpy(msg.description, description_, sizeof(temp.password)-1);
+
+	int tempsnd = CTS_ADD_TASK;
+	send(sock, &tempsnd, sizeof(tempsnd), 0);
+	send(sock, &msg, sizeof(msg), 0);
+}
+
+void test_komendy(const int sock) {
 	test_komunikat_zalogowany();
 	while( 1 ) {
 		int komenda;
@@ -137,8 +171,7 @@ void test_komendy() {
 				wyswietl_listy(sock);
 				break;
 			case 2:
-				//TODO
-
+				dodaj_zadanie(sock);
 				break;
 			default:
 				printf("Zla komenda\n");
@@ -153,15 +186,16 @@ int main(int argc, char *argv[]){
 	
 	ip = argv[1];
 	port = argv[2];
-
 //	// test1 - user: test || pass: testowa
 //	int sock = conn();
 //	test_user(sock, "test", "testowa", STC_LOGIN_OK);
 //	//test2 - user: blad || pass: cokolwiek 
 //	sock = conn();
 //	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
-
 	sock = conn();
+	test_zaloguj(sock);
+	test_komendy(sock);
+}
 
 
 
