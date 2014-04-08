@@ -162,7 +162,6 @@ static int getTasksCallback(void *data, int argc, char **argv, char **azColName)
 {
 	std::vector<ListDatabase::ListTask>* tmp = (std::vector<ListDatabase::ListTask>*) data;
 	
-	std::cout << "heheh" << std::endl; 
 	ListDatabase::ListTask x;
 	(x.id) = atoi(argv[0]);
 	x.description = argv[1];
@@ -173,6 +172,7 @@ static int getTasksCallback(void *data, int argc, char **argv, char **azColName)
 	{
 		x.parent_id = -1;
 	}
+	cout << azColName[3];
 	x.child_ct = atoi(argv[4]);
 	x.done = atoi(argv[5]);
 	
@@ -242,6 +242,34 @@ std::vector<ListDatabase::ListTask>* ListDatabase::getLists(ListDatabase::ListUs
 }
 
 
+std::vector<ListDatabase::ListTask>* ListDatabase::getSubTasks(ListTask parent_task)
+{
+	std::vector<ListDatabase::ListTask>* to_ret = new std::vector<ListDatabase::ListTask>();
+
+	if(parent_task.id != -1)
+		if(parent_task.id >= 0)
+		{
+			open();
+			char *zErrMsg = 0;
+			int rc;
+			std::ostringstream oss;
+			oss << "SELECT *,  strftime('%s',CreatedOn ), strftime('%s',LastChange ) FROM Tasks WHERE ParentID = '" << parent_task.id << "';";
+			
+			//std::cout << oss.str() << std::endl;
+			
+			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)to_ret, &zErrMsg);
+			oss.clear();
+			
+			
+			
+			close();
+		}
+	
+	
+	return to_ret;
+	
+}
+
 /*
 int main()
 {
@@ -257,7 +285,7 @@ int main()
 	for(int i =0; i< vect->size(); ++i)
 	{
 		auto tmp = vect->at(i);
-		cout << tmp.id << "  " << tmp.description << "   " << tmp.owner_id << "   " << tmp.created_on << std::endl;
+		cout << "bum bum " << tmp.id << "  " << tmp.description << "   " << tmp.parent_id << "   " << tmp.created_on << std::endl;
 	}
 	
 	delete vect;

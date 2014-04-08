@@ -96,9 +96,9 @@ public:
 	
 	std::vector<ListTask>* getTasks(ListUser user); // zwraca wszystkie zadania utworzone przez usera
 	std::vector<ListTask>* getLists(ListUser user); // zwraca korzenie zadan utowrzone przez usera //TODO tez z pozwoleniami
-	/*std::vector<ListTask> & getSubTasks(ListTask parent_task);
+	std::vector<ListTask>* getSubTasks(ListTask parent_task); //zwraca liste podzadan powiazana z danym zadaniem
 	
-	void updateTask(ListTask task);
+	/*void updateTask(ListTask task);
 	void addTask(ListTask task);
 	
 	std::vector<ListTask> & changedTasks(ListUser user/*, typ_daty lastUpdate); */ 
