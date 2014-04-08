@@ -66,6 +66,8 @@ public:
 		TaskID_t parent_id;
 		TaskChildCt_t child_ct;
 		TaskDone_t done;
+		DateType created_on;
+		DateType last_change;
 		
 		static int nothing(void *NotUsed, int argc, char **argv, char **azColName){return 0;};
 		void getID(sqlite3* db);
