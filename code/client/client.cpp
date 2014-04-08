@@ -1,18 +1,13 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include <stdio.h>
-#include <string.h>
 #include <unistd.h>
+
 #include <stdlib.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
+#include <stdio.h>
 
 #include "protocol/proto.h"
 #include <assert.h>
-
-#define MAX_STRING 100
-#define BUFFER_SIZE 10001
 
 #define debug 1
 
@@ -89,6 +84,7 @@ int main(int argc, char *argv[]){
 	// TODO
 
 	// test1 - user: test || pass: testowa
+
 	int sock = conn();
 	test_user(sock, "test", "testowa", STC_LOGIN_OK);
 	//test2 - user: blad || pass: cokolwiek 
