@@ -148,10 +148,10 @@ void dodaj_zadanie(const int sock) {
 	int parent_;
 	char description_[4000];
 	//TODO
-	printf("prosze podad id: ");
-	scanf("%d\n", &parent_);
-	printf("prosze podac opis: ");
-	scanf("%s\n", description_);
+	printf("prosze podad id: \n");
+	scanf("%d", &parent_);
+	printf("prosze podac opis: \n");
+	scanf("%s", description_);
 
 	struct cts_add_task msg;
 	msg.parent = parent_;
@@ -189,10 +189,10 @@ void test_zaloguj(const int sock) {
 		   "	powtornie ---> nie udalo sie zalogowac\n");
 	unsigned odpowiedz;
 	do{
-		printf("Prosze podac uzytkownika: ");
-		scanf("%s\n", user);
-		printf("Prosze podac haslo: ");
-		scanf("%s\n", pass);
+		printf("Prosze podac uzytkownika: \n");
+		scanf("%s", user);
+		printf("Prosze podac haslo:\n ");
+		scanf("%s", pass);
 		zaloguj(sock, user, pass);
 
 		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
