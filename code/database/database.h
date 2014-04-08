@@ -71,6 +71,7 @@ public:
 		
 		static int nothing(void *NotUsed, int argc, char **argv, char **azColName){return 0;};
 		void getID(sqlite3* db);
+		//void link(TaskID_t parent_id);
 	public:
 		ListTask()
 		{};
@@ -93,7 +94,8 @@ public:
 	void open();
 	void close();
 	
-	std::vector<ListTask>* getTasks(ListUser user);
+	std::vector<ListTask>* getTasks(ListUser user); // zwraca wszystkie zadania utworzone przez usera
+	std::vector<ListTask>* getLists(ListUser user); // zwraca korzenie zadan utowrzone przez usera //TODO tez z pozwoleniami
 	/*std::vector<ListTask> & getSubTasks(ListTask parent_task);
 	
 	void updateTask(ListTask task);
