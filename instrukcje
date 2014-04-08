@@ -1,7 +1,4 @@
-przygotowanie bazy danych:
-cd code/serwer
-sqlite3 testowa.db
->.read ../baza.sql
+baza danych z jednym uzytkownikiem (test:testowa) znajduje sie w code/server/testowa.db
 
 kompilacja podprogramow:
 make w code/database
