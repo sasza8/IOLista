@@ -172,7 +172,7 @@ static int getTasksCallback(void *data, int argc, char **argv, char **azColName)
 	{
 		x.parent_id = -1;
 	}
-	cout << azColName[3];
+	
 	x.child_ct = atoi(argv[4]);
 	x.done = atoi(argv[5]);
 	

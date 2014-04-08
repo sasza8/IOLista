@@ -94,7 +94,7 @@ void wyswietl_pomocnicza(const int sock, int number) {
 	// wyswietlamy zadania
 	for( int i = 0 ; i < number ; i++ ){
 		printf("Probuje pobrac STC_TASK\n");
-		printf("%d\n", recv(sock, &temp, sizeof(temp), 0));
+		recv(sock, &temp, sizeof(temp), 0);
 		if (temp != STC_TASK) { printf("%x\n", temp); assert(false); }
 		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
