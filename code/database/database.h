@@ -32,7 +32,7 @@ public:
 	class ListUser
 	{
 	public:
-		UserID_t* id;
+		UserID_t id;
 		Text_t login;
 		Text_t pass;
 		Text_t salt;
@@ -45,16 +45,13 @@ public:
 		
 		void getID(sqlite3* db); //!!! Pewnie wywali sie przy wspolbieznosci
 	public:
-		ListUser(){
-		id = new UserID_t(); };
+		ListUser(){};
 		ListUser(Text_t login, Text_t pass, Text_t salt,
 				Text_t f_name, Text_t l_name, Text_t email) :
-				id(nullptr), login(login), pass(pass), salt(salt), //TODO wyifowac maxy
+				id(-1), login(login), pass(pass), salt(salt), //TODO wyifowac maxy
 				f_name(f_name), l_name(l_name), email(email) {}; //TODO  sprawdzic czy login juz jest
 		~ListUser()
 		{
-			if(id != nullptr)
-				delete id;
 		}
 		
 		void insert(sqlite3* db);
@@ -62,10 +59,11 @@ public:
 
 	class ListTask
 	{
-		TaskID_t* id;
+	public:
+		TaskID_t id;
 		Text_t description;
 		UserID_t owner_id;
-		TaskID_t* parent_id;
+		TaskID_t parent_id;
 		TaskChildCt_t child_ct;
 		TaskDone_t done;
 		
@@ -73,13 +71,10 @@ public:
 		void getID(sqlite3* db);
 	public:
 		ListTask()
-		{
-			id = new TaskID_t();
-			parent_id = new TaskID_t();
-		};
-		ListTask(Text_t description, UserID_t owner_id, TaskID_t* parent_id, 
+		{};
+		ListTask(Text_t description, UserID_t owner_id, TaskID_t parent_id, 
 					TaskDone_t done) : 
-					id(nullptr), description(description), owner_id(owner_id), 
+					id(-1), description(description), owner_id(owner_id), 
 					parent_id(parent_id), child_ct(0), done(done) {};
 		
 		void insert(sqlite3* db);
@@ -95,9 +90,9 @@ public:
 	
 	void open();
 	void close();
-	/*
-	std::vector<ListTask> & getTasks(ListUser user);
-	std::vector<ListTask> & getSubTasks(ListTask parent_task);
+	
+	std::vector<ListTask>* getTasks(ListUser user);
+	/*std::vector<ListTask> & getSubTasks(ListTask parent_task);
 	
 	void updateTask(ListTask task);
 	void addTask(ListTask task);
@@ -109,7 +104,7 @@ public:
 	
 	ListUser getUser(Text_t login);
 	
-	ListTask addTask(Text_t description, UserID_t owner_id, TaskID_t* parent_id, 
+	ListTask addTask(Text_t description, UserID_t owner_id, TaskID_t parent_id, 
 					TaskDone_t done);
 				
 	/*
