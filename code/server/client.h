@@ -1,12 +1,16 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_
 
+#include "database/database.h"
+
 #include <string>
 using namespace std;
 
 class Client
 {
 	int sock;
+	
+	ListDatabase::ListUser userDetails;
 public:
 	struct LoginDetails
 	{
@@ -19,11 +23,12 @@ public:
 		string username;
 		string password;
 		// inne - e-mail itp.
-	}
+	};
 	
+	void setUserDetails(ListDatabase::ListUser dbUser);
 	
 	LoginDetails getLoginDetails();
-	RegisterDetails getLoginDetails();
+	RegisterDetails getRegisterDetails();
 	void loginOK();
 	void loginFailed();
 	void registerOK();

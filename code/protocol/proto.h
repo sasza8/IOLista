@@ -7,6 +7,7 @@
 // CTS - pakiet przesylany od klienta do serwera
 // STC - na odwrot
 
+// --------------------- LOGOWANIE ----------------------
 const unsigned CTS_LOGIN = 0x01; // sygnalizacja logowania, pusty pakiet
 const unsigned CTS_LOGIN_DETAILS = 0x02; // nazwa uzytkownika i haslo
 struct cts_login_details
@@ -18,6 +19,8 @@ struct cts_login_details
 const unsigned STC_LOGIN_OK = 0x03; // pusty
 const unsigned STC_LOGIN_FAILED = 0x04; // pusty
 
+
+// -------------------REJESTRACJA-----------------------
 const unsigned CTS_REGISTER = 0x1001; // sygnalizacja rejestracji nowego uzytkownika, pusty pakiet
 const unsigned CTS_REGISTER_DETAILS = 0x1002; // szczegoly rejestracji
 struct cts_register_details
@@ -29,21 +32,30 @@ struct cts_register_details
 
 const unsigned STC_REGISTER_OK = 0x1003;
 
-const unsigned CTS_GET_LISTS = 0x2001; // zadanie wyslania wszystkich list, do ktorych user ma dostep, pusty pakiet
-const unsigned STC_LISTS_BEGIN = 0x2002; // naglowek listy list
-struct stc_list_begin
+// ---------------------POBIERANIE ZADAN--------------------------
+const unsigned CTS_GET_TASKS = 0x3001; // zadanie wyslania wszystkich zadan z danej listy
+struct cts_get_tasks
 {
-	int number; // liczba list, ktore beda przeslane
+	int id; // id parenta (wartosc ujemna oznacza null)
 };
 
-const unsigned STC_LIST = 0x2003;
-struct stc_list
+const unsigned STC_TASK = 0x3002;
+struct stc_task
 {
 	int id;
-	char name[200];
+	char description[4000];
+	char owner[200];
+	bool done;
+	int createdon;
+	int lastchange;
 };
 
-const unsigned CTS_GET_TASKS = 0x2004; // zadanie wyslania wszystkich zadan z danego pakietu
-
+// -------------------DODAWANIE ZADAN----------------------------------
+const unsigned CTS_ADD_TASK = 0x4001;
+struct cts_add_task
+{
+	int parent;
+	char description[4000];
+};
 
 #endif

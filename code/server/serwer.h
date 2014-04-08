@@ -5,16 +5,22 @@
 using namespace std;
 
 #include "client.h"
+#include "database/database.h"
 
 class Server
 {
+	ListDatabase db;
+	
 	void serveClient(int sock);
 	
 	static string generateSalt();
 public:	
 	void Listen();
-	bool loginClient(Client client);
-	bool registerClient(Client client);
+	bool loginClient(Client &client);
+	bool registerClient(Client &client);
+	
+	Server();
+	~Server();
 };
 
 #endif
