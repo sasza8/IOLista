@@ -76,17 +76,39 @@ int conn() {
 	return sock;
 }
 
-void wyswietl_listy(const int sock) {
-	int tempresp;
-	int lists_number;
-	int tempsnd = CTS_GET_TASKS;
-	send(sock, &tempsnd, sizeof(tempsnd), 0); // CTS_GET_TASKS
-	recv(sock, &lists_number, sizeof(lists_number), 0); // ile list
+void test_komunikat_zalogowany(){
+	printf("Jestes zalogowany jako uzytkownik %s\n", user);
+	printf("Wpisz:\n");
+	printf("	1 - aby zobaczyc swoje zadania\n");
+	printf("	2 - aby dodac nowe zadanie\n");
+	printf("	ctrl^c aby wyjsc z programu ;)\n");
+}
 
-	for( int i = 0 ; i < lists_number ; i++ ){
+void test_komunikat_dodaj_zadanie(){
+	printf("Aby dodac nowe zadanie trzeba podac 2 wartosci:\n"
+			"	ojciec - id ZADANIA, tworzone zadanie stanie sie "
+			"podzadaniem zadania z id ojciec ( wpisac -1 "
+			"gdy chcemy zeby zadanie nie bylo podzadaniem)\n"
+			"	opis - tekstowy opis zadania\n"
+	);
+}
+
+void test_komunikat_pobierz_zadania(){
+	printf("Aby pobrac zadania trzeba wpisac id.\n"
+			"ID oznacza ID zadania ktore chcemy pobrac\n"
+			"Jezeli chcesz zobaczyc wszystkie zadania wpisz -1\n"
+	);
+}
+
+// odbiera i wyswietla 'number' zadan
+// POMOCNICZA! uzywana przez funkcje wyswietl_zadania( ... )
+void wyswietl_pomocnicza(const int sock, int number) {
+	int temp;
+	// wyswietlamy zadania
+	for( int i = 0 ; i < number ; i++ ){
 		do{ // czekamy na pakiet STC_TASK
-			recv(sock, &tempresp, sizeof(tempresp), 0);
-		} while tempresp != STC_TASK
+			recv(sock, &temp, sizeof(temp), 0);
+		} while temp != STC_TASK
 		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
 		// id na 0, name na FAIL albo cos takiego
@@ -107,6 +129,33 @@ void wyswietl_listy(const int sock) {
 	}
 }
 
+// pobiera ID zadania, wyswietla wszystkie podzadania?
+void wyswietl_zadania(const int sock) {
+	test_komunikat_pobierz_zadania();
+
+	int id;
+	printf("prosze podac id: ");
+	scanf("%d", &id);
+
+	// Wysylamy pakiet i id zadania
+	int temp = CTS_GET_TASKS;
+	send(sock, &temp, sizeof(temp), 0); // CTS_GET_TASKS
+	struct cts_get_tasks task_id;
+	task_id.id = id;
+	send(sock, &task_id, sizeof(task_id), 0);
+
+	// czekamy na odpowiedni pakiet i odbieramy ilosc zadan
+	do{ 
+		recv(sock, &temp, sizeof(temp), 0);
+	} while recv != STC_START_TASKS;
+	struct stc_start_tasks task_number;
+	recv(sock, &task_number, sizeof(task_number), 0);
+
+	// wyswietlamy zadania!
+	wyswietl_pomocnicza(sock, task_number.number);
+}
+
+// probuje sie zalogowac do skutku! pobiera USER i PASS z stdin
 void test_zaloguj() {
 	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo"
 		   "	powtornie ---> nie udalo sie zalogowac\n");
@@ -121,23 +170,6 @@ void test_zaloguj() {
 		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
 
 	} while odpowiedz != STC_LOGIN_OK;
-}
-
-void test_komunikat_zalogowany(){
-	printf("Jestes zalogowany jako uzytkownik %s\n", user);
-	printf("Wpisz:\n");
-	printf("	1 - aby zobaczyc swoje zadania\n");
-	printf("	2 - aby dodac nowe zadanie\n");
-	printf("	ctrl^c aby wyjsc z programu ;)\n");
-}
-
-void test_komunikat_dodaj_zadanie(){
-	printf("Aby dodac nowe zadanie trzeba podac 2 wartosci:\n"
-			"	ojciec - id ZADANIA, tworzone zadanie stanie sie "
-			"podzadaniem zadania z id ojciec ( wpisac -1 "
-			"gdy chcemy zeby zadanie nie bylo podzadaniem)\n"
-			"	opis - tekstowy opis zadania\n"
-	);
 }
 
 // Pobiera z wejscia dane i wysyla je do serwera z odpowiednim pakietem
@@ -168,7 +200,7 @@ void test_komendy(const int sock) {
 		switch komenda {
 			case 1:
 				printf("Zadania uzytkownika %s:\n", user);
-				wyswietl_listy(sock);
+				wyswietl_zadania(sock);
 				break;
 			case 2:
 				dodaj_zadanie(sock);
