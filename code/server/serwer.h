@@ -9,7 +9,9 @@ using namespace std;
 class Server
 {
 	void serveClient(int sock);
-public:
+	
+	static string generateSalt();
+public:	
 	void Listen();
 	bool loginClient(Client client);
 	bool registerClient(Client client);

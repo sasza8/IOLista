@@ -26,6 +26,19 @@ Client::LoginDetails Client::getLoginDetails()
 	return ret;
 }
 
+Client::RegisterDetails Client::getRegisterDetails()
+{
+	int type = getType();
+	if(type != CTS_REGISTER_DETAILS);
+		// wyjateczek
+	cts_register_details details;
+	recv(sock, &details, sizeof(details), 0);
+	Client::RegisterDetails ret;
+	ret.username = details.username;
+	ret.password = details.password;
+	return ret;
+}
+
 void Client::sendType(unsigned type)
 {
 	send(sock, &type, sizeof(type), 0);
