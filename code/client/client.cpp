@@ -10,12 +10,12 @@
 #include "../protocol/proto.h"
 #include <assert.h>
 
-#define debug 1
-
 char *ip, *port;
 char user[100];
 char pass[100];
 
+// probuje sie zalogowac
+// NIE SPRAWDZA odpowiedzi serwera!! czy FAIL czy OK trzeba sprawdzic samemu
 void zaloguj(int sock, const char *username, const char *pass){
 	int tempsnd = CTS_LOGIN;
 	send(sock, &tempsnd, sizeof(tempsnd), 0);
@@ -29,18 +29,7 @@ void zaloguj(int sock, const char *username, const char *pass){
 	send(sock, &temp, sizeof(temp), 0);
 }
 
-void test_user(const int sock, const char *username, const char *pass,
-		const unsigned odpowiedz_serwera) {
-
-	zaloguj(sock, username, pass);
-
-	unsigned odpowiedz;
-	recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
-	printf("%u\n", odpowiedz);
-
-	assert(odpowiedz==odpowiedz_serwera);
-}
-
+// Laczy sie na podany z lini polecen adres i port, zwraca gniazdo polaczenia
 int conn() {
 	int sock;
 
@@ -50,9 +39,8 @@ int conn() {
 	size_t len;
 	ssize_t len2;
 
-	if( debug )
-		printf("<--------------------------------->\n address: %s\n port: %s\n",
-				ip, port);
+	printf("<--------------------------------->\n address: %s\n port: %s\n",
+			ip, port);
 
 	// Laczymy sie po TCP z serwerem
 	memset(&addr_hints, 0, sizeof(struct addrinfo));
@@ -76,6 +64,7 @@ int conn() {
 	return sock;
 }
 
+// --------------------- KOMUNIKATY TEKSTOWE ----------------------
 void test_komunikat_zalogowany(){
 	printf("Jestes zalogowany jako uzytkownik %s\n", user);
 	printf("Wpisz:\n");
@@ -100,6 +89,7 @@ void test_komunikat_pobierz_zadania(){
 	);
 }
 
+// ---------------- FUNKCJE OBSLUGUJACE KOMUNIKATY ------------------
 // odbiera i wyswietla 'number' zadan
 // POMOCNICZA! uzywana przez funkcje wyswietl_zadania( ... )
 void wyswietl_pomocnicza(const int sock, int number) {
@@ -155,23 +145,6 @@ void wyswietl_zadania(const int sock) {
 	wyswietl_pomocnicza(sock, task_number.number);
 }
 
-// probuje sie zalogowac do skutku! pobiera USER i PASS z stdin
-void test_zaloguj() {
-	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo"
-		   "	powtornie ---> nie udalo sie zalogowac\n");
-	do{
-		printf("Prosze podac uzytkownika: ");
-		scanf("%s\n", user);
-		printf("Prosze podac haslo: ");
-		scanf("%s\n", pass);
-		zaloguj(conn, user, pass);
-
-		unsigned odpowiedz;
-		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
-
-	} while odpowiedz != STC_LOGIN_OK;
-}
-
 // Pobiera z wejscia dane i wysyla je do serwera z odpowiednim pakietem
 void dodaj_zadanie(const int sock) {
 	test_komunikat_dodaj_zadanie();
@@ -192,6 +165,8 @@ void dodaj_zadanie(const int sock) {
 	send(sock, &msg, sizeof(msg), 0);
 }
 
+// ------------------ FUNKCJE TESTOWE --------------------------------
+// pozwala testowac baze danych, wczytuje i reaguje na komendy
 void test_komendy(const int sock) {
 	test_komunikat_zalogowany();
 	while( 1 ) {
@@ -211,6 +186,22 @@ void test_komendy(const int sock) {
 	}
 }
 
+// probuje sie zalogowac do skutku! pobiera USER i PASS z stdin
+void test_zaloguj() {
+	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo"
+		   "	powtornie ---> nie udalo sie zalogowac\n");
+	do{
+		printf("Prosze podac uzytkownika: ");
+		scanf("%s\n", user);
+		printf("Prosze podac haslo: ");
+		scanf("%s\n", pass);
+		zaloguj(conn, user, pass);
+
+		unsigned odpowiedz;
+		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
+
+	} while odpowiedz != STC_LOGIN_OK;
+}
 int main(int argc, char *argv[]){
 	
 	if( argc != 3 )
