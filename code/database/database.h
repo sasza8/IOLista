@@ -19,7 +19,6 @@ const int USER_EMAIL_MAX = 100;
 // Table Tasks
 typedef int TaskID_t;
 const int TASK_DESC_MAX = 4000;
-typedef int TaskOwner_t;
 typedef int TaskParent_t;
 typedef int TaskChildCt_t;
 typedef int TaskDone_t;
@@ -30,32 +29,6 @@ typedef int Perm_t;
 
 class ListDatabase
 {
-public:
-	ListDatabase(std::string filename);
-	~ListDatabase();
-	
-	
-	
-	void open();
-	void close();
-	
-	std::vector<ListTask> & getTasks(ListUser user);
-	std::vector<ListTask> & getSubTasks(ListTask parent_task);
-	
-	void updateTask(ListTask task);
-	void addTask(ListTask task);
-	
-	std::vector<ListTask> & changedTasks(ListUser user/*, typ_daty lastUpdate*/);
-	
-	ListUser addUser(Text_t login, Text_t pass, Text_t salt,
-				Text_t f_name, Text_t l_name, Text_t email); //dodaje i zwraca usera
-	
-	bool canChange(ListUser user, ListTask task);
-	bool canFinish(ListUser user, ListTask task);
-	
-	void finish(ListUser user, ListTask task);
-	void change(ListUser user, ListTask task, std::string description);
-
 public:
 	class ListUser
 	{
@@ -70,11 +43,11 @@ public:
 		static int nothing(void *NotUsed, int argc, char **argv, char **azColName){return 0;};
 		static int idSelect(void *NotUsed, int argc, char **argv, char **azColName);
 		
-		void getID();
+		void getID(sqlite3* db); //!!! Pewnie wywali sie przy wspolbieznosci
 	public:
 		ListUser(Text_t login, Text_t pass, Text_t salt,
 				Text_t f_name, Text_t l_name, Text_t email) :
-				id(nullptr), login(login), pass(pass), salt(salt),
+				id(nullptr), login(login), pass(pass), salt(salt), //TODO wyifowac maxy
 				f_name(f_name), l_name(l_name), email(email) {}; //TODO  sprawdzic czy login juz jest
 		~ListUser()
 		{
@@ -87,9 +60,52 @@ public:
 
 	class ListTask
 	{
-
+		TaskID_t* id;
+		Text_t description;
+		UserID_t* owner_id;
+		TaskParent_t* parent_id;
+		TaskChildCt_t child_ct;
+		TaskDone_t done;
+		
+		void getID(sqlite3* db);
+	public:
+		ListTask(Text_t description, UserID_t* owner_id, TaskParent_t* parent_id, 
+					TaskDone_t done, DateType created_at) : 
+					id(nullptr), description(description), owner_id(owner_id), 
+					parent_id(parent_id), child_ct(0), done(done) {};
+		
+		void insert(sqlite3* db);
 	};
 	
+
+
+public:
+	ListDatabase(std::string filename);
+	~ListDatabase();
+	
+	
+	
+	void open();
+	void close();
+	/*
+	std::vector<ListTask> & getTasks(ListUser user);
+	std::vector<ListTask> & getSubTasks(ListTask parent_task);
+	
+	void updateTask(ListTask task);
+	void addTask(ListTask task);
+	
+	std::vector<ListTask> & changedTasks(ListUser user/*, typ_daty lastUpdate); */ 
+	
+	ListUser addUser(Text_t login, Text_t pass, Text_t salt,
+				Text_t f_name, Text_t l_name, Text_t email); //dodaje i zwraca usera
+				
+	/*
+	bool canChange(ListUser user, ListTask task);
+	bool canFinish(ListUser user, ListTask task);
+	
+	void finish(ListUser user, ListTask task);
+	void change(ListUser user, ListTask task, std::string description); */
+
 		
 
 private:
