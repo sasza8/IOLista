@@ -1,16 +1,4 @@
-CREATE TABLE List_node
-(
-ID INTEGER PRIMARY KEY,
-Val INTEGER NOT NULL,
-NextNd INTEGER --to ma byc referencja na List_node jak ktos potrafi zrobic lepsza liste niech powie :P
-);
 
-CREATE TABLE List
-(
-ID INTEGER PRIMARY KEY,
-ListFirst INTEGER REFERENCES List_node,
-ListLast INTEGER REFERENCES List_node
-);
 
 
 CREATE TABLE Users
@@ -35,7 +23,7 @@ CREATE TABLE Tasks
 TaskID INTEGER PRIMARY KEY,
 Description VARCHAR2(4000),
 Owner INTEGER REFERENCES Users,
-AncListID INTEGER NOT NULL REFERENCES List, --pierwszy jest najstaszy przodek
+ParentID INTEGER,
 ChildCounter Integer Not NULL, --TODEL? zawiera liczbe niezakonczonych synow tego zadania
 Done INTEGER NOT NULL, --TODO poprawic typ
 CreatedOn DATE NOT NULL,
