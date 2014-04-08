@@ -34,8 +34,8 @@ void ListDatabase::close()
 
 void ListDatabase::ListUser::getID(sqlite3* db)
 {
-	id = new UserID_t();
-	*id = sqlite3_last_insert_rowid(db); //!!! wywali sie przy wspolbieznosci
+	//id = new UserID_t();
+	id = sqlite3_last_insert_rowid(db); //!!! wywali sie przy wspolbieznosci
 }
 
 void ListDatabase::ListUser::insert(sqlite3* db)
@@ -77,8 +77,7 @@ ListDatabase::ListUser ListDatabase::addUser(Text_t login, Text_t pass, Text_t s
 
 void ListDatabase::ListTask::getID(sqlite3* db)
 {
-	id = new UserID_t();
-	*id = sqlite3_last_insert_rowid(db); //!!! wywali sie przy wspolbieznosci
+	id = sqlite3_last_insert_rowid(db); //!!! wywali sie przy wspolbieznosci
 }
 
 
@@ -91,8 +90,8 @@ void ListDatabase::ListTask::insert(sqlite3* db)
 	<< description <<"',";
 	oss << owner_id;
 	oss << ",";
-	if(parent_id != nullptr)
-		oss << *parent_id;
+	if(parent_id != -1)
+		oss << parent_id;
 	else
 		oss << "NULL";
 	oss << "," << child_ct << "," << done << "," << "CURRENT_TIMESTAMP,CURRENT_TIMESTAMP" <<");";
@@ -110,7 +109,7 @@ void ListDatabase::ListTask::insert(sqlite3* db)
 }
 
 ListDatabase::ListTask ListDatabase::addTask(Text_t description, UserID_t owner_id, 
-					TaskID_t* parent_id, TaskDone_t done)
+					TaskID_t parent_id, TaskDone_t done)
 {
 	open();
 	ListTask task = ListTask(description, owner_id, parent_id, done);
@@ -124,7 +123,7 @@ ListDatabase::ListTask ListDatabase::addTask(Text_t description, UserID_t owner_
 int ListDatabase::getUserCallback(void *data, int argc, char **argv, char **azColName)
 {
 	ListUser* tmp = (ListUser*) data;
-	*(tmp->id) = atoi(argv[0]);
+	(tmp->id) = atoi(argv[0]);
 	tmp->login = argv[1];
 	tmp->pass = argv[2];
 	tmp->salt = argv[3];
@@ -143,7 +142,7 @@ ListDatabase::ListUser ListDatabase::getUser(Text_t login)
 	int rc;
 
 	ListUser* data = new ListUser();
-	*data->id = -1;
+	data->id = -1;
 	std::ostringstream oss;
 	oss << "SELECT * FROM Users WHERE Login = '" << login << "';";
 	
@@ -156,6 +155,56 @@ ListDatabase::ListUser ListDatabase::getUser(Text_t login)
 }
 
 
+static int getTasksCallback(void *data, int argc, char **argv, char **azColName)
+{
+	std::vector<ListDatabase::ListTask>* tmp = (std::vector<ListDatabase::ListTask>*) data;
+	
+	std::cout << "heheh" << std::endl; 
+	/*ListDatabase::ListTask x;
+	*(x.id) = atoi(argv[0]);
+	x.description = argv[1];
+	x.owner_id = atoi(argv[2]);
+	if(argv[3])
+		*x.parent_id = atoi(argv[3]);
+	else
+	{
+		x.parent_id = -1;
+	}
+	x.child_ct = atoi(argv[4]);
+	x.done = atoi(argv[5]);
+	
+	
+	std::cout << argv[6] << "    " << argv[7] << " hehhe " << std::endl;
+	
+	tmp->push_back(x);*/
+	return 0;
+}
+ 
+
+std::vector<ListDatabase::ListTask>* ListDatabase::getTasks(ListDatabase::ListUser user)
+{
+	//std::vector<ListDatabase::ListTask>* to_ret = new std::vector<ListDatabase::ListTask>();
+
+	/*if(user.id != nullptr)
+		if(*user.id >= 0)
+		{
+			open();
+			char *zErrMsg = 0;
+			int rc;
+			std::ostringstream oss;
+			oss << "SELECT * FROM Tasks WHERE Owner = '" << *user.id << "';";
+			
+			//std::cout << oss.str() << std::endl;
+			
+			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)&to_ret, &zErrMsg);
+			close();
+		}*/
+	
+	
+	return new std::vector<ListDatabase::ListTask>();
+	
+}
+
 
 
 /*
@@ -163,10 +212,10 @@ int main()
 {
 	ListDatabase x = ListDatabase("hehe");
 	//x.addUser("pikaczu32", "aa", "aa", "aa", "aa", "aa");
-	//auto z = x.getUser("pikaczu32");
-	//cout << *z.id << "   " << z.login << "  " << z.email << std::endl;
-	x.addTask("kup chleb", 1, nullptr, 0);
-}*/ 
-
+	auto z = x.getUser("pikaczu32");
+	cout << z.id << "   " << z.login << "  " << z.email << std::endl;
+	x.getTasks(z);
+}
+*/
 
 
