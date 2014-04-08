@@ -13,6 +13,8 @@
 #define debug 1
 
 char *ip, *port;
+char user[100];
+char pass[100];
 
 void zaloguj(int sock, const char *username, const char *pass){
 	int tempsnd = CTS_LOGIN;
@@ -29,7 +31,7 @@ void zaloguj(int sock, const char *username, const char *pass){
 
 
 
-void test_user(int sock, const char *username, const char *pass,
+void test_user(const int sock, const char *username, const char *pass,
 		const unsigned odpowiedz_serwera) {
 
 	zaloguj(sock, username, pass);
@@ -77,29 +79,32 @@ int conn()
 	return sock;
 }
 
-int main(int argc, char *argv[]){
-	
-	if( argc != 3 )
-		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera");
-	
-	ip = argv[1];
-	port = argv[2];
+void wyswietl_listy(const int conn) {
+	// Wysylamy zadanie 
+	int tempsnd = CTS_GET_LISTS;
+	send(sock, &tempsnd, sizeof(tempsnd), 0);
 
-	// JESTESMY POLACZENI Z SERWERM NA gniezdzie sock!
-	// Czas sprawdzic jakies pierdoly
-	// TODO
+	int tempresp;
+	do{ // czekamy na pakiet CTS_LISTS_BEGIN
+		recv(sock, &tempresp, sizeof(tempresp), 0);
+	} while tempresp != CTS_LISTS_BEGIN;
+	int lists_number;
+	recv(sock, &lists_number, sizeof(lists_number), 0);
 
-//	// test1 - user: test || pass: testowa
-//	int sock = conn();
-//	test_user(sock, "test", "testowa", STC_LOGIN_OK);
-//	//test2 - user: blad || pass: cokolwiek 
-//	sock = conn();
-//	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
+	for( int i = 0 ; i < lists_number ; i++ ){
+		do{ // czekamy na pakiet STC_LIST
+			recv(sock, &tempresp, sizeof(tempresp), 0);
+		} while tempresp != STC_LIST;
+		struct stc_list list;
+		// TODO - tutaj moze inicjalizacja? 
+		// id na 0, name na FAIL albo cos takiego
+		recv(sock, &list, sizeof(list), 0);
+		printf("ID: %d, ZADANIE: %s\n", list.id, list.name);
+	}
+}
 
-	char user[100];
-	char pass[100];
-	int sock = conn();
-		printf("Prosze sie zalogowac, jezeli program zpayta o uzytkowniak i haslo powtornie ---> nie udalpo sie zalogowac");
+void test_zaloguj() {
+	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo powtornie ---> nie udalpo sie zalogowac");
 	do{
 		printf("Prosze podac uzytkownika: ");
 		scanf("%s\n", user);
@@ -111,8 +116,52 @@ int main(int argc, char *argv[]){
 		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
 
 	} while odpowiedz != STC_LOGIN_OK;
+}
 
-	// jestesmy zalogowani:
+void test_komunikat_zalogowany(){
+	printf("Jestes zalogowany jako uzytkownik %s\n", user);
+	printf("Wpisz:\n");
+	printf("	1 - aby zobaczyc swoje zadania\n");
+	printf("	2 - aby dodac nowe zadanie\n");
+	printf("	ctrl^c aby wyjsc z programu ;)\n");
+}
+
+void test_komendy() {
+	test_komunikat_zalogowany();
+	while( 1 ) {
+		int komenda;
+		scanf("%d", &komenda);
+		switch komenda {
+			case 1:
+				printf("Zadania uzytkownika %s:\n", user);
+				wyswietl_listy(sock);
+				break;
+			case 2:
+				//TODO
+
+				break;
+			default:
+				printf("Zla komenda\n");
+		}
+	}
+}
+
+int main(int argc, char *argv[]){
+	
+	if( argc != 3 )
+		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera");
+	
+	ip = argv[1];
+	port = argv[2];
+
+//	// test1 - user: test || pass: testowa
+//	int sock = conn();
+//	test_user(sock, "test", "testowa", STC_LOGIN_OK);
+//	//test2 - user: blad || pass: cokolwiek 
+//	sock = conn();
+//	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
+
+	sock = conn();
 
 
 

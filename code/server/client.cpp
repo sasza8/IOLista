@@ -1,5 +1,6 @@
 #include "client.h"
 #include "protocol/proto.h"
+#include "database/database.h"
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -11,6 +12,11 @@ Client::Client(int sock) : sock(sock) {}
 Client::~Client()
 {
 	close(sock);
+}
+
+void Client::setUserDetails(ListDatabase::ListUser dbUser)
+{
+	userDetails = dbUser;
 }
 
 Client::LoginDetails Client::getLoginDetails()

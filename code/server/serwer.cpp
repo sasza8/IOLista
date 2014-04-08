@@ -11,6 +11,8 @@ using namespace std;
 
 #include "serwer.h"
 #include "protocol/proto.h"
+#include "database/database.h"
+#include "sha1.h"
 
 string Server::generateSalt()
 {
@@ -35,7 +37,11 @@ void Server::serveClient(int sock)
 	{
 		case CTS_LOGIN:
 			if(loginClient(client) == false)
+			{
+				client.loginFailed();
 				return;
+			}
+			client.loginOK();
 			break;
 		case CTS_REGISTER:
 			registerClient(client);
@@ -47,31 +53,57 @@ void Server::serveClient(int sock)
 	}
 }
 
-bool Server::loginClient(Client client)
+bool Server::loginClient(Client &client)
 {
 	Client::LoginDetails loginDetails = client.getLoginDetails();
-	// szukamy usera w bazie
 	printf("Proba zalogowania uzytkownika %s:%s\n", loginDetails.username.c_str(), loginDetails.password.c_str());
-	if(loginDetails.username == "test" && loginDetails.password == "testowa")
+	
+	ListDatabase::ListUser dbUser = db.getUser(loginDetails.username.c_str());
+	if(dbUser.id == -1)
 	{
-		printf("Sukces\n");
-		client.loginOK();
-		return true;
-	}
-	else
-	{
-		printf("Porazka\n");
-		client.loginFailed();
+		printf("Brak uzytkownika %s\n", loginDetails.username.c_str());
 		return false;
 	}
+	
+	unsigned char hash[20];
+	char hashString[41];
+	string salt = dbUser.salt;
+	string stringToHash = loginDetails.password + salt;
+	sha1::calc(stringToHash.c_str(), stringToHash.length(), hash);
+	sha1::toHexString(hash, hashString);
+	
+	printf("Obliczony hash dla %s: %s\n", stringToHash.c_str(), hashString);
+	
+	if(string(hashString) != dbUser.pass)
+	{
+		printf("Zla nazwa uzytkownika / haslo dla %s\n", dbUser.login.c_str());
+		return false;
+	}
+	
+	//client.setUserDetails(dbUser);
+	printf("Zalogowano uzytkownika %s\n", dbUser.login.c_str());
+	return true;
+	
 }
 
-bool Server::registerClient(Client client)
+bool Server::registerClient(Client &client)
 {
 	Client::RegisterDetails registerDetails = client.getRegisterDetails();
 	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
 	client.registerOK();
+	return true;
 }
+
+Server::Server() : db("testowa.db")
+{
+	db.open();
+}
+
+Server::~Server()
+{
+	db.close();
+}
+
 
 void Server::Listen()
 {
