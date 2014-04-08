@@ -63,7 +63,7 @@ int conn() {
 
 // --------------------- KOMUNIKATY TEKSTOWE ----------------------
 void test_komunikat_zalogowany(){
-	printf("Jestes zalogowany jako uzytkownik %s\n", user);
+	printf("\n\nJestes zalogowany jako uzytkownik %s\n", user);
 	printf("Wpisz:\n");
 	printf("	1 - aby zobaczyc swoje zadania\n");
 	printf("	2 - aby dodac nowe zadanie\n");
@@ -71,16 +71,16 @@ void test_komunikat_zalogowany(){
 }
 
 void test_komunikat_dodaj_zadanie(){
-	printf("Aby dodac nowe zadanie trzeba podac 2 wartosci:\n"
+	printf("\n\nAby dodac nowe zadanie trzeba podac 2 wartosci:\n"
 			"	ojciec - id ZADANIA, tworzone zadanie stanie sie "
-			"podzadaniem zadania z id ojciec ( wpisac -1 "
+			"podzadaniem zadania z id ojciec\n ( wpisac -1 "
 			"gdy chcemy zeby zadanie nie bylo podzadaniem)\n"
 			"	opis - tekstowy opis zadania\n"
 	);
 }
 
 void test_komunikat_pobierz_zadania(){
-	printf("Aby pobrac zadania trzeba wpisac id.\n"
+	printf("\n\nAby pobrac zadania trzeba wpisac id.\n"
 			"ID oznacza ID zadania ktore chcemy pobrac\n"
 			"Jezeli chcesz zobaczyc wszystkie zadania wpisz -1\n"
 	);
@@ -91,12 +91,14 @@ void test_komunikat_pobierz_zadania(){
 // POMOCNICZA! uzywana przez funkcje wyswietl_zadania( ... )
 void wyswietl_pomocnicza(const int sock, int number) {
 	unsigned int temp;
+	printf("LICZBA ZADAN: %d \n", number);
 	// wyswietlamy zadania
 	for( int i = 0 ; i < number ; i++ ){
 		do{ // czekamy na pakiet STC_TASK
-			printf("Probuje pobrac STC_TASK\n");
+			//printf("Probuje pobrac STC_TASK\n");
 			recv(sock, &temp, sizeof(temp), 0);
 		} while (temp != STC_TASK);
+		//printf(" ZA STC_TASK\n");
 		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
 		// id na 0, name na FAIL albo cos takiego
@@ -167,9 +169,8 @@ void dodaj_zadanie(const int sock) {
 // ------------------ FUNKCJE TESTOWE --------------------------------
 // pozwala testowac baze danych, wczytuje i reaguje na komendy
 void test_komendy(const int sock) {
-	test_komunikat_zalogowany();
 	while( 1 ) {
-		printf("Czekam na komende:  ");
+		test_komunikat_zalogowany();
 		int komenda;
 		scanf("%d", &komenda);
 		switch( komenda ) {
