@@ -202,7 +202,7 @@ void test_zaloguj(const int sock) {
 int main(int argc, char *argv[]){
 	
 	if( argc != 3 )
-		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera");
+		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera\n");
 	
 	ip = argv[1];
 	port = argv[2];
@@ -212,7 +212,9 @@ int main(int argc, char *argv[]){
 //	//test2 - user: blad || pass: cokolwiek 
 //	sock = conn();
 //	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
+	printf("Nawiazuje polaczenie...\n");
 	int sock = conn();
+	printf("Polaczenie nawiazane\n");
 	test_zaloguj(sock);
 	test_komendy(sock);
 }

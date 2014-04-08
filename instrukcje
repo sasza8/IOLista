@@ -4,7 +4,9 @@ sqlite3 testowa.db
 >.read ../baza.sql
 
 kompilacja podprogramow:
-make w code/serwer, code/database i code/client
+make w code/database
+make w code/client
+make w code/serwer
 
 testowanie:
 cd code/serwer
