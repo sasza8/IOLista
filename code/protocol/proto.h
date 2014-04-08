@@ -39,7 +39,13 @@ struct cts_get_tasks
 	int id; // id parenta (wartosc ujemna oznacza null)
 };
 
-const unsigned STC_TASK = 0x3002;
+const unsigned STC_START_TASKS = 0x3002;
+struct stc_start_tasks
+{
+	int number; // liczba taskow, ktore beda przeslane
+}
+
+const unsigned STC_TASK = 0x3003;
 struct stc_task
 {
 	int id;

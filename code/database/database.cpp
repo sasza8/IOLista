@@ -91,7 +91,10 @@ void ListDatabase::ListTask::insert(sqlite3* db)
 	oss << owner_id;
 	oss << ",";
 	if(parent_id != -1)
+	{
 		oss << parent_id;
+		//link(parent_id);
+	}
 	else
 		oss << "NULL";
 	oss << "," << child_ct << "," << done << "," << "CURRENT_TIMESTAMP,CURRENT_TIMESTAMP" <<");";
@@ -160,12 +163,12 @@ static int getTasksCallback(void *data, int argc, char **argv, char **azColName)
 	std::vector<ListDatabase::ListTask>* tmp = (std::vector<ListDatabase::ListTask>*) data;
 	
 	std::cout << "heheh" << std::endl; 
-	/*ListDatabase::ListTask x;
-	*(x.id) = atoi(argv[0]);
+	ListDatabase::ListTask x;
+	(x.id) = atoi(argv[0]);
 	x.description = argv[1];
 	x.owner_id = atoi(argv[2]);
 	if(argv[3])
-		*x.parent_id = atoi(argv[3]);
+		x.parent_id = atoi(argv[3]);
 	else
 	{
 		x.parent_id = -1;
@@ -174,37 +177,69 @@ static int getTasksCallback(void *data, int argc, char **argv, char **azColName)
 	x.done = atoi(argv[5]);
 	
 	
-	std::cout << argv[6] << "    " << argv[7] << " hehhe " << std::endl;
+	//std::cout << argv[6] << "    " << argv[7] << " hehhe " << std::endl;
+	x.created_on = atoi(argv[8]);
+	x.last_change = atoi(argv[9]);
 	
-	tmp->push_back(x);*/
+	tmp->push_back(x);
 	return 0;
 }
  
 
 std::vector<ListDatabase::ListTask>* ListDatabase::getTasks(ListDatabase::ListUser user)
 {
-	//std::vector<ListDatabase::ListTask>* to_ret = new std::vector<ListDatabase::ListTask>();
+	std::vector<ListDatabase::ListTask>* to_ret = new std::vector<ListDatabase::ListTask>();
 
-	/*if(user.id != nullptr)
-		if(*user.id >= 0)
+	if(user.id != -1)
+		if(user.id >= 0)
 		{
 			open();
 			char *zErrMsg = 0;
 			int rc;
 			std::ostringstream oss;
-			oss << "SELECT * FROM Tasks WHERE Owner = '" << *user.id << "';";
+			oss << "SELECT *,  strftime('%s',CreatedOn ), strftime('%s',LastChange ) FROM Tasks WHERE Owner = '" << user.id << "';";
+			
 			
 			//std::cout << oss.str() << std::endl;
 			
-			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)&to_ret, &zErrMsg);
+			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)to_ret, &zErrMsg);
 			close();
-		}*/
+		}
 	
 	
-	return new std::vector<ListDatabase::ListTask>();
+	return to_ret;
 	
 }
 
+
+
+std::vector<ListDatabase::ListTask>* ListDatabase::getLists(ListDatabase::ListUser user)
+{
+	std::vector<ListDatabase::ListTask>* to_ret = new std::vector<ListDatabase::ListTask>();
+
+	if(user.id != -1)
+		if(user.id >= 0)
+		{
+			open();
+			char *zErrMsg = 0;
+			int rc;
+			std::ostringstream oss;
+			oss << "SELECT *,  strftime('%s',CreatedOn ), strftime('%s',LastChange ) FROM Tasks WHERE ParentID IS NULL AND Owner = '" << user.id << "';";
+			
+			//std::cout << oss.str() << std::endl;
+			
+			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)to_ret, &zErrMsg);
+			oss.clear();
+			
+			
+			
+			close();
+		}
+	
+	
+	return to_ret;
+	
+}
 
 
 /*
@@ -214,8 +249,21 @@ int main()
 	//x.addUser("pikaczu32", "aa", "aa", "aa", "aa", "aa");
 	auto z = x.getUser("pikaczu32");
 	cout << z.id << "   " << z.login << "  " << z.email << std::endl;
-	x.getTasks(z);
-}
-*/
+	
+	auto vect =  x.getTasks(z);
+	cout << vect->size();
+	
+	
+	for(int i =0; i< vect->size(); ++i)
+	{
+		auto tmp = vect->at(i);
+		cout << tmp.id << "  " << tmp.description << "   " << tmp.owner_id << "   " << tmp.created_on << std::endl;
+	}
+	
+	delete vect;
+	return 0;
+	
+}*/
+
 
 
