@@ -18,6 +18,8 @@ public:
 	void Listen();
 	bool loginClient(Client &client);
 	bool registerClient(Client &client);
+	bool addTask(Client &client);
+	bool getTasks(Client &client);
 	
 	Server();
 	~Server();

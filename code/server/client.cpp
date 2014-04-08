@@ -45,6 +45,24 @@ Client::RegisterDetails Client::getRegisterDetails()
 	return ret;
 }
 
+Client::TaskDetails Client::getTaskDetails()
+{
+	cts_add_task details;
+	recv(sock, &details, sizeof(details), 0)
+	
+	Client::TaskDetails ret;
+	ret.description = details.description;
+	ret.parent = details.parent < 0 ? -1 : details.parent;
+	return ret;
+}
+
+int Client::getTasksParent()
+{
+	cts_get_tasks details;
+	recv(sock, &details, sizeof(details), 0);
+	return details.id;
+}
+
 void Client::sendType(unsigned type)
 {
 	send(sock, &type, sizeof(type), 0);
@@ -70,4 +88,9 @@ void Client::loginFailed()
 void Client::registerOK()
 {
 	sendType(STC_REGISTER_OK);
+}
+
+unsigned Client::getID()
+{
+	return userDetails.id;
 }

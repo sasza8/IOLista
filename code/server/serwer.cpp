@@ -51,6 +51,21 @@ void Server::serveClient(int sock)
 			// wysylamy info o bledzie
 			return;
 	}
+	
+	// tutaj juz mamy zalogowanego usera i mozemy go obslugiwac
+	while(true)
+	{
+		type = client.getType();
+		switch(type)
+		{
+			case CTS_ADD_TASK:
+				addTask(client);
+				break;
+			case CTS_GET_TASKS:
+				listTasks(client);
+				break;
+		}
+	}
 }
 
 bool Server::loginClient(Client &client)
@@ -91,6 +106,13 @@ bool Server::registerClient(Client &client)
 	Client::RegisterDetails registerDetails = client.getRegisterDetails();
 	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
 	client.registerOK();
+	return true;
+}
+
+bool Server::addTask(Client &client)
+{
+	Client::TaskDetails taskDetails = client.getTaskDetails();
+	db.addTask(taskDetails.description, client.getID(), taskDetails.parent, false);
 	return true;
 }
 
