@@ -270,6 +270,35 @@ std::vector<ListDatabase::ListTask>* ListDatabase::getSubTasks(ListTask parent_t
 	
 }
 
+
+std::vector<ListDatabase::ListTask>* ListDatabase::getSubTasksList(ListUser user, ListTask parent_task)
+{
+	std::vector<ListDatabase::ListTask>* to_ret = new std::vector<ListDatabase::ListTask>();
+
+	if(user.id != -1)
+		if(parent_task.id >= 0)
+		{
+			open();
+			char *zErrMsg = 0;
+			int rc;
+			std::ostringstream oss;
+			oss << "SELECT *,  strftime('%s',CreatedOn ), strftime('%s',LastChange ) FROM Tasks WHERE ParentID = '" << parent_task.id << "' AND Owner = '" << user.id << "';";
+			
+			//std::cout << oss.str() << std::endl;
+			
+			rc = sqlite3_exec(db, oss.str().c_str(), getTasksCallback, (void*)to_ret, &zErrMsg);
+			oss.clear();
+			
+			
+			
+			close();
+		}
+	
+	
+	return to_ret;
+	
+}
+
 /*
 int main()
 {
@@ -292,7 +321,6 @@ int main()
 	return 0;
 	
 }*/
-
 
 
 
