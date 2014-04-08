@@ -30,32 +30,6 @@ typedef int Perm_t;
 
 class ListDatabase
 {
-	
-	private:
-	class ListUser
-	{
-		UserID_t* id;
-		Text_t login;
-		Text_t pass;
-		Text_t salt;
-		Text_t f_name;
-		Text_t l_name;
-		Text_t email;
-	public:
-		ListUser(Text_t login, Text_t pass, Text_t salt,
-				Text_t f_name, Text_t l_name, Text_t email) :
-				id(nullptr), login(login), pass(pass), salt(salt),
-				f_name(f_name), l_name(l_name), email(email) {};
-		void insert(sqlite3* db);
-	};
-
-	class ListTask
-	{
-
-	};
-	
-	std::string name;
-	sqlite3* db;
 public:
 	ListDatabase(std::string filename);
 	~ListDatabase();
@@ -73,16 +47,54 @@ public:
 	
 	std::vector<ListTask> & changedTasks(ListUser user/*, typ_daty lastUpdate*/);
 	
-	void addUser(Text_t login, Text_t pass, Text_t salt,
-				Text_t f_name, Text_t l_name, Text_t email);
+	ListUser addUser(Text_t login, Text_t pass, Text_t salt,
+				Text_t f_name, Text_t l_name, Text_t email); //dodaje i zwraca usera
 	
 	bool canChange(ListUser user, ListTask task);
 	bool canFinish(ListUser user, ListTask task);
 	
 	void finish(ListUser user, ListTask task);
 	void change(ListUser user, ListTask task, std::string description);
+
+public:
+	class ListUser
+	{
+		UserID_t* id;
+		Text_t login;
+		Text_t pass;
+		Text_t salt;
+		Text_t f_name;
+		Text_t l_name;
+		Text_t email;
+		
+		static int nothing(void *NotUsed, int argc, char **argv, char **azColName){return 0;};
+		static int idSelect(void *NotUsed, int argc, char **argv, char **azColName);
+		
+		void getID();
+	public:
+		ListUser(Text_t login, Text_t pass, Text_t salt,
+				Text_t f_name, Text_t l_name, Text_t email) :
+				id(nullptr), login(login), pass(pass), salt(salt),
+				f_name(f_name), l_name(l_name), email(email) {}; //TODO  sprawdzic czy login juz jest
+		~ListUser()
+		{
+			if(id != nullptr)
+				delete id;
+		}
+		
+		void insert(sqlite3* db);
+	};
+
+	class ListTask
+	{
+
+	};
 	
-	
+		
+
+private:
+	std::string name;
+	sqlite3* db;
 };
 
 
