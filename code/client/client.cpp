@@ -94,6 +94,7 @@ void wyswietl_pomocnicza(const int sock, int number) {
 	// wyswietlamy zadania
 	for( int i = 0 ; i < number ; i++ ){
 		do{ // czekamy na pakiet STC_TASK
+			printf("Probuje pobrac STC_TASK\n");
 			recv(sock, &temp, sizeof(temp), 0);
 		} while (temp != STC_TASK);
 		struct stc_task task;
@@ -133,6 +134,7 @@ void wyswietl_zadania(const int sock) {
 
 	// czekamy na odpowiedni pakiet i odbieramy ilosc zadan
 	do{ 
+		printf("Probuje pobrac STC_START_TASKS...\n");
 		recv(sock, &temp, sizeof(temp), 0);
 	} while (temp != STC_START_TASKS);
 	struct stc_start_tasks task_number;
@@ -167,6 +169,7 @@ void dodaj_zadanie(const int sock) {
 void test_komendy(const int sock) {
 	test_komunikat_zalogowany();
 	while( 1 ) {
+		printf("Czekam na komende:  ");
 		int komenda;
 		scanf("%d", &komenda);
 		switch( komenda ) {
