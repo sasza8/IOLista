@@ -25,15 +25,25 @@ public:
 		// inne - e-mail itp.
 	};
 	
+	struct TaskDetails
+	{
+		int parent;
+		string description;
+	}
+	
 	void setUserDetails(ListDatabase::ListUser dbUser);
 	
 	LoginDetails getLoginDetails();
 	RegisterDetails getRegisterDetails();
+	TaskDetails getTaskDetails();
+	
 	void loginOK();
 	void loginFailed();
 	void registerOK();
 	void sendType(unsigned type);
 	unsigned getType(); // odbiera od klienta sam typ pakietu
+	
+	unsigned getID();
 	
 	Client(int sock);
 	~Client();

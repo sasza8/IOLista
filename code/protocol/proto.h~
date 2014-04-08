@@ -36,7 +36,7 @@ const unsigned STC_REGISTER_OK = 0x1003;
 const unsigned CTS_GET_TASKS = 0x3001; // zadanie wyslania wszystkich zadan z danej listy
 struct cts_get_tasks
 {
-	int id; // id listy
+	int id; // id parenta (wartosc ujemna oznacza null)
 };
 
 const unsigned STC_TASK = 0x3002;
@@ -50,6 +50,12 @@ struct stc_task
 	int lastchange;
 };
 
-// -------------------DODAWANIE LIST----------------------------------
+// -------------------DODAWANIE ZADAN----------------------------------
+const unsigned CTS_ADD_TASK = 0x4001;
+struct cts_add_task
+{
+	int parent;
+	char description[4000];
+};
 
 #endif
