@@ -19,7 +19,6 @@ const int USER_EMAIL_MAX = 100;
 // Table Tasks
 typedef int TaskID_t;
 const int TASK_DESC_MAX = 4000;
-typedef int TaskParent_t;
 typedef int TaskChildCt_t;
 typedef int TaskDone_t;
 typedef int DateType; // timestamp 
@@ -47,7 +46,7 @@ public:
 		void getID(sqlite3* db); //!!! Pewnie wywali sie przy wspolbieznosci
 	public:
 		ListUser(){
-		id = new UserID_t();};
+		id = new UserID_t(); };
 		ListUser(Text_t login, Text_t pass, Text_t salt,
 				Text_t f_name, Text_t l_name, Text_t email) :
 				id(nullptr), login(login), pass(pass), salt(salt), //TODO wyifowac maxy
@@ -65,14 +64,20 @@ public:
 	{
 		TaskID_t* id;
 		Text_t description;
-		UserID_t* owner_id;
-		TaskParent_t* parent_id;
+		UserID_t owner_id;
+		TaskID_t* parent_id;
 		TaskChildCt_t child_ct;
 		TaskDone_t done;
 		
+		static int nothing(void *NotUsed, int argc, char **argv, char **azColName){return 0;};
 		void getID(sqlite3* db);
 	public:
-		ListTask(Text_t description, UserID_t* owner_id, TaskParent_t* parent_id, 
+		ListTask()
+		{
+			id = new TaskID_t();
+			parent_id = new TaskID_t();
+		};
+		ListTask(Text_t description, UserID_t owner_id, TaskID_t* parent_id, 
 					TaskDone_t done) : 
 					id(nullptr), description(description), owner_id(owner_id), 
 					parent_id(parent_id), child_ct(0), done(done) {};
@@ -104,8 +109,8 @@ public:
 	
 	ListUser getUser(Text_t login);
 	
-	/*ListTask addTask(Text_t description, UserID_t* owner_id, TaskParent_t* parent_id, 
-					TaskDone_t done */
+	ListTask addTask(Text_t description, UserID_t owner_id, TaskID_t* parent_id, 
+					TaskDone_t done);
 				
 	/*
 	bool canChange(ListUser user, ListTask task);

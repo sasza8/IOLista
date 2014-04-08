@@ -1,3 +1,4 @@
+
 #include <iostream>
 
 
@@ -82,16 +83,13 @@ void ListDatabase::ListTask::getID(sqlite3* db)
 
 
 
-/*void ListDatabase::ListTask::insert(sqlite3* db)
+void ListDatabase::ListTask::insert(sqlite3* db)
 { //TODO injctions!!! 
 	char *zErrMsg = 0;
 	std::ostringstream oss;
 	oss << "INSERT INTO Tasks (Description, Owner, ParentID, ChildCounter, Done, CreatedOn, LastChange) VALUES ('"
 	<< description <<"',";
-	if(owner_id != nullptr)
-		oss << *owner_id;
-	else
-		oss << "NULL";
+	oss << owner_id;
 	oss << ",";
 	if(parent_id != nullptr)
 		oss << *parent_id;
@@ -99,16 +97,27 @@ void ListDatabase::ListTask::getID(sqlite3* db)
 		oss << "NULL";
 	oss << "," << child_ct << "," << done << "," << "CURRENT_TIMESTAMP,CURRENT_TIMESTAMP" <<");";
 	
-	std::cout << oss.str() << std::endl;
+	//std::cout << oss.str() << std::endl;
 	
-	/*if(sqlite3_exec(db, oss.str().c_str(), nothing, 0, &zErrMsg)!= SQLITE_OK )
+	
+	if(sqlite3_exec(db, oss.str().c_str(), nothing, 0, &zErrMsg)!= SQLITE_OK )
 	{
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
-	}*/
+	}
 	//oss.clear();
-	//getID(db);
-//}
+	getID(db);
+}
+
+ListDatabase::ListTask ListDatabase::addTask(Text_t description, UserID_t owner_id, 
+					TaskID_t* parent_id, TaskDone_t done)
+{
+	open();
+	ListTask task = ListTask(description, owner_id, parent_id, done);
+	task.insert(db);
+	close();
+	return task;
+}
 
 
 
@@ -134,6 +143,7 @@ ListDatabase::ListUser ListDatabase::getUser(Text_t login)
 	int rc;
 
 	ListUser* data = new ListUser();
+	*data->id = -1;
 	std::ostringstream oss;
 	oss << "SELECT * FROM Users WHERE Login = '" << login << "';";
 	
@@ -141,6 +151,7 @@ ListDatabase::ListUser ListDatabase::getUser(Text_t login)
 	
 	rc = sqlite3_exec(db, oss.str().c_str(), getUserCallback, (void*)data, &zErrMsg);
 	close();
+	
 	return *data;
 }
 
@@ -152,9 +163,10 @@ int main()
 {
 	ListDatabase x = ListDatabase("hehe");
 	//x.addUser("pikaczu32", "aa", "aa", "aa", "aa", "aa");
-	auto z = x.getUser("pikaczu32");
-	cout << *z.id << "   " << z.login << "  " << z.email << std::endl;
-}
+	//auto z = x.getUser("pikaczu32");
+	//cout << *z.id << "   " << z.login << "  " << z.email << std::endl;
+	x.addTask("kup chleb", 1, nullptr, 0);
+}*/ 
 
-*/
+
 
