@@ -7,16 +7,14 @@
 #include <cstdio>
 #include <cstring>
 
-#include "protocol/proto.h"
+#include "../protocol/proto.h"
 #include <assert.h>
 
 #define debug 1
 
 char *ip, *port;
 
-void test_user(int sock, const char * username, const char * pass,
-		const unsigned odpowiedz_serwera) {
-
+void zaloguj(int sock, const char *username, const char *pass){
 	int tempsnd = CTS_LOGIN;
 	send(sock, &tempsnd, sizeof(tempsnd), 0);
 
@@ -27,6 +25,14 @@ void test_user(int sock, const char * username, const char * pass,
 	tempsnd = CTS_LOGIN_DETAILS;
 	send(sock, &tempsnd, sizeof(tempsnd), 0);
 	send(sock, &temp, sizeof(temp), 0);
+}
+
+
+
+void test_user(int sock, const char *username, const char *pass,
+		const unsigned odpowiedz_serwera) {
+
+	zaloguj(sock, username, pass);
 
 	unsigned odpowiedz;
 	recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
@@ -83,16 +89,30 @@ int main(int argc, char *argv[]){
 	// Czas sprawdzic jakies pierdoly
 	// TODO
 
-	// test1 - user: test || pass: testowa
+//	// test1 - user: test || pass: testowa
+//	int sock = conn();
+//	test_user(sock, "test", "testowa", STC_LOGIN_OK);
+//	//test2 - user: blad || pass: cokolwiek 
+//	sock = conn();
+//	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
 
+	char user[100];
+	char pass[100];
 	int sock = conn();
-	test_user(sock, "test", "testowa", STC_LOGIN_OK);
-	//test2 - user: blad || pass: cokolwiek 
-	sock = conn();
-	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
+		printf("Prosze sie zalogowac, jezeli program zpayta o uzytkowniak i haslo powtornie ---> nie udalpo sie zalogowac");
+	do{
+		printf("Prosze podac uzytkownika: ");
+		scanf("%s\n", user);
+		printf("Prosze podac haslo: ");
+		scanf("%s\n", pass);
+		zaloguj(conn, user, pass);
 
-	return 0;
-}
+		unsigned odpowiedz;
+		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
+
+	} while odpowiedz != STC_LOGIN_OK;
+
+	// jestesmy zalogowani:
 
 
 
