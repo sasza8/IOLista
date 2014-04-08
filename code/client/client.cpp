@@ -36,9 +36,6 @@ int conn() {
 	struct addrinfo addr_hints;
 	struct addrinfo *addr_result;
 
-	size_t len;
-	ssize_t len2;
-
 	printf("<--------------------------------->\n address: %s\n port: %s\n",
 			ip, port);
 
@@ -93,12 +90,12 @@ void test_komunikat_pobierz_zadania(){
 // odbiera i wyswietla 'number' zadan
 // POMOCNICZA! uzywana przez funkcje wyswietl_zadania( ... )
 void wyswietl_pomocnicza(const int sock, int number) {
-	int temp;
+	unsigned int temp;
 	// wyswietlamy zadania
 	for( int i = 0 ; i < number ; i++ ){
 		do{ // czekamy na pakiet STC_TASK
 			recv(sock, &temp, sizeof(temp), 0);
-		} while temp != STC_TASK
+		} while (temp != STC_TASK);
 		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
 		// id na 0, name na FAIL albo cos takiego
@@ -128,7 +125,7 @@ void wyswietl_zadania(const int sock) {
 	scanf("%d", &id);
 
 	// Wysylamy pakiet i id zadania
-	int temp = CTS_GET_TASKS;
+	unsigned int temp = CTS_GET_TASKS;
 	send(sock, &temp, sizeof(temp), 0); // CTS_GET_TASKS
 	struct cts_get_tasks task_id;
 	task_id.id = id;
@@ -137,7 +134,7 @@ void wyswietl_zadania(const int sock) {
 	// czekamy na odpowiedni pakiet i odbieramy ilosc zadan
 	do{ 
 		recv(sock, &temp, sizeof(temp), 0);
-	} while recv != STC_START_TASKS;
+	} while (temp != STC_START_TASKS);
 	struct stc_start_tasks task_number;
 	recv(sock, &task_number, sizeof(task_number), 0);
 
@@ -158,7 +155,7 @@ void dodaj_zadanie(const int sock) {
 
 	struct cts_add_task msg;
 	msg.parent = parent_;
-	strncpy(msg.description, description_, sizeof(temp.password)-1);
+	strncpy(msg.description, description_, sizeof(msg.description)-1);
 
 	int tempsnd = CTS_ADD_TASK;
 	send(sock, &tempsnd, sizeof(tempsnd), 0);
@@ -172,7 +169,7 @@ void test_komendy(const int sock) {
 	while( 1 ) {
 		int komenda;
 		scanf("%d", &komenda);
-		switch komenda {
+		switch( komenda ) {
 			case 1:
 				printf("Zadania uzytkownika %s:\n", user);
 				wyswietl_zadania(sock);
@@ -187,20 +184,20 @@ void test_komendy(const int sock) {
 }
 
 // probuje sie zalogowac do skutku! pobiera USER i PASS z stdin
-void test_zaloguj() {
+void test_zaloguj(const int sock) {
 	printf("Prosze sie zalogowac, jezeli program zapyta o uzytkowniak i haslo"
 		   "	powtornie ---> nie udalo sie zalogowac\n");
+	unsigned odpowiedz;
 	do{
 		printf("Prosze podac uzytkownika: ");
 		scanf("%s\n", user);
 		printf("Prosze podac haslo: ");
 		scanf("%s\n", pass);
-		zaloguj(conn, user, pass);
+		zaloguj(sock, user, pass);
 
-		unsigned odpowiedz;
 		recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
 
-	} while odpowiedz != STC_LOGIN_OK;
+	} while (odpowiedz != STC_LOGIN_OK);
 }
 int main(int argc, char *argv[]){
 	
@@ -215,7 +212,7 @@ int main(int argc, char *argv[]){
 //	//test2 - user: blad || pass: cokolwiek 
 //	sock = conn();
 //	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
-	sock = conn();
+	int sock = conn();
 	test_zaloguj(sock);
 	test_komendy(sock);
 }
