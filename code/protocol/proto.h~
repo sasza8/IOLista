@@ -49,7 +49,7 @@ const unsigned STC_TASK = 0x3003;
 struct stc_task
 {
 	int id;
-	char description[4000];
+	char description[400];
 	char owner[200];
 	bool done;
 	int createdon;
