@@ -11,12 +11,12 @@
 #include "protocol/proto.h"
 #include <assert.h>
 
-#define MAX_STRING 100
-#define BUFFER_SIZE 10001
-
 #define debug 1
 
-void test_user(int sock, const char * username, const char * pass,
+// Sprawdza, czy uzytkownik username z haslem pass po probie
+// polaczenia sie z serwerem otrzyma oczekiwana odpowiedz
+//    - sock - otwarte gniazdo, poalczenie z serwerem
+void test_user_login(int sock, const char * username, const char * pass,
 		const unsigned odpowiedz_serwera) {
 
 	write(sock, CTS_LOGIN, sizeof(CTS_LOGIN));
@@ -39,10 +39,6 @@ int main(int argc, char *argv[]){
 
 	struct addrinfo addr_hints;
 	struct addrinfo *addr_result;
-
-	char buffer[BUFFER_SIZE];
-	size_t len;
-	ssize_t len2;
 
 	if( argc != 3 )
 		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera");
@@ -75,9 +71,9 @@ int main(int argc, char *argv[]){
 	// TODO
 
 	// test1 - user: test || pass: testowa
-	test_user(sock, "test", "testowa", STC_LOGINOK);
+	test_user_login(sock, "test", "testowa", STC_LOGINOK);
 	//test2 - user: blad || pass: cokolwiek 
-	test_user(sock, "blad", "cokolwiek666", STC_LOGINFAILED);
+	test_user_login(sock, "blad", "cokolwiek666", STC_LOGINFAILED);
 
 	return 0;
 }
