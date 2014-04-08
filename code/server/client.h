@@ -8,14 +8,23 @@ class Client
 {
 	int sock;
 public:
-	cts_login_details getLoginDetails();
+	struct LoginDetails
+	{
+		string username;
+		string password;
+	};
+	
+	
+	LoginDetails getLoginDetails();
 	void loginOK();
+	void loginFailed();
 	void registerOK();
 	void sendType(unsigned type);
-	int getType(); // odbiera od klienta sam typ pakietu
+	unsigned getType(); // odbiera od klienta sam typ pakietu
 	
 	Client(int sock);
 	~Client();
+
 };
 
 #endif

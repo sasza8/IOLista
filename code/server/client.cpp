@@ -13,21 +13,17 @@ Client::~Client()
 	close(sock);
 }
 
-cts_login_details Client::getLoginDetails()
+Client::LoginDetails Client::getLoginDetails()
 {
+	int type = getType();
+	if(type != CTS_LOGIN_DETAILS);
+		// wyjateczek
 	cts_login_details details;
 	recv(sock, &details, sizeof(details), 0);
-	return details;
-}
-
-void Client::loginOK()
-{
-	sendType(STC_LOGIN_OK);
-}
-
-void Client::registerOK()
-{
-	sendType(STC_REGISTER_OK);
+	Client::LoginDetails ret;
+	ret.username = details.username;
+	ret.password = details.password;
+	return ret;
 }
 
 void Client::sendType(unsigned type)
@@ -35,7 +31,24 @@ void Client::sendType(unsigned type)
 	send(sock, &type, sizeof(type), 0);
 }
 
-int Client::getType()
+unsigned Client::getType()
 {
-	return 0;
+	int type;
+	recv(sock, &type, sizeof(type), 0);
+	return type;
+}
+
+void Client::loginOK()
+{
+	sendType(STC_LOGIN_OK);
+}
+
+void Client::loginFailed()
+{
+	sendType(STC_LOGIN_FAILED);
+}
+
+void Client::registerOK()
+{
+	sendType(STC_REGISTER_OK);
 }

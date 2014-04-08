@@ -16,25 +16,31 @@
 
 #define debug 1
 
+char *ip, *port;
+
 void test_user(int sock, const char * username, const char * pass,
 		const unsigned odpowiedz_serwera) {
 
-	write(sock, CTS_LOGIN, sizeof(CTS_LOGIN));
+	int tempsnd = CTS_LOGIN;
+	send(sock, &tempsnd, sizeof(tempsnd), 0);
 
-	struct ctr_login_details temp;
-	temp.username = username;
-	temp.password = pass;
+	struct cts_login_details temp;
+	strncpy(temp.username, username, sizeof(temp.username)-1);
+	strncpy(temp.password, pass, sizeof(temp.password)-1);
 
-	write(sock, CTS_LOGIN_DETAILS, sizeof(CTS_LOGIN_DETAILS));
-	write(sock, temp, sizeof(temp));
+	tempsnd = CTS_LOGIN_DETAILS;
+	send(sock, &tempsnd, sizeof(tempsnd), 0);
+	send(sock, &temp, sizeof(temp), 0);
 
-	const unsigned odpowiedz;
-	read(sock, &odpowiedz, sizeof(odpowiedz));
+	unsigned odpowiedz;
+	recv(sock, &odpowiedz, sizeof(odpowiedz), 0);
+	printf("%u\n", odpowiedz);
 
 	assert(odpowiedz==odpowiedz_serwera);
 }
 
-int main(int argc, char *argv[]){
+int conn()
+{
 	int sock;
 
 	struct addrinfo addr_hints;
@@ -44,19 +50,16 @@ int main(int argc, char *argv[]){
 	size_t len;
 	ssize_t len2;
 
-	if( argc != 3 )
-		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera");
-
 	if( debug )
 		printf("<--------------------------------->\n address: %s\n port: %s\n",
-				argv[1], argv[2]);
+				ip, port);
 
 	// Laczymy sie po TCP z serwerem
 	memset(&addr_hints, 0, sizeof(struct addrinfo));
 	addr_hints.ai_family = AF_INET; // IPv4
 	addr_hints.ai_socktype = SOCK_STREAM;
 	addr_hints.ai_protocol = IPPROTO_TCP;
-	if( getaddrinfo(argv[1], argv[2],
+	if( getaddrinfo(ip, port,
 				&addr_hints, &addr_result) != 0 );
 
 	// tworzymy socket zgodnie z informacjami z getaddrinfo
@@ -69,15 +72,28 @@ int main(int argc, char *argv[]){
 				addr_result->ai_addrlen) < 0);
 
 	freeaddrinfo(addr_result);
+	
+	return sock;
+}
+
+int main(int argc, char *argv[]){
+	
+	if( argc != 3 )
+		printf("URUCHAMIAC TAK: ./program adres_serwera port_serwera");
+	
+	ip = argv[1];
+	port = argv[2];
 
 	// JESTESMY POLACZENI Z SERWERM NA gniezdzie sock!
 	// Czas sprawdzic jakies pierdoly
 	// TODO
 
 	// test1 - user: test || pass: testowa
-	test_user(sock, "test", "testowa", STC_LOGINOK);
+	int sock = conn();
+	test_user(sock, "test", "testowa", STC_LOGIN_OK);
 	//test2 - user: blad || pass: cokolwiek 
-	test_user(sock, "blad", "cokolwiek666", STC_LOGINFAILED);
+	sock = conn();
+	test_user(sock, "blad", "cokolwiek666", STC_LOGIN_FAILED);
 
 	return 0;
 }

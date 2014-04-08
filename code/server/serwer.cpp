@@ -23,18 +23,13 @@ void Server::serveClient(int sock)
 				return;
 			break;
 		case CTS_REGISTER:
-			registerClient(client);
+			//registerClient(client);
 			return;
 			break;
 		default:
 			// wysylamy info o bledzie
 			return;
 	}
-}
-
-string Server::getSaltOfUser(string username)
-{
-	return "";
 }
 
 void Server::Listen()
@@ -78,15 +73,27 @@ void Server::Listen()
 
 bool Server::loginClient(Client client)
 {
-	cts_login_details loginDetails = client.getLoginDetails();
+	Client::LoginDetails loginDetails = client.getLoginDetails();
 	// szukamy usera w bazie
-	client.loginOK();
+	printf("Proba zalogowania uzytkownika %s:%s\n", loginDetails.username.c_str(), loginDetails.password.c_str());
+	if(loginDetails.username == "test" && loginDetails.password == "testowa")
+	{
+		printf("Sukces\n");
+		client.loginOK();
+		return true;
+	}
+	else
+	{
+		printf("Porazka\n");
+		client.loginFailed();
+		return false;
+	}
 }
 
-bool Server::registerClient(Client client)
+/*bool Server::registerClient(Client client)
 {
 	cts_register_details registerDetails = client.getRegisterDetails();
 	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
 	client.registerOK();
-}
+}*/
 

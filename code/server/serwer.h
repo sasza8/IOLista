@@ -12,6 +12,7 @@ class Server
 public:
 	void Listen();
 	bool loginClient(Client client);
+	bool registerClient(Client client);
 };
 
 #endif
