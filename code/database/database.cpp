@@ -293,6 +293,8 @@ std::vector<ListDatabase::ListTask>* ListDatabase::getSubTasksList(ListUser user
 			
 			close();
 		}
+		else
+			return getLists(user);
 	
 	
 	return to_ret;
