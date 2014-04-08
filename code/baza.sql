@@ -26,8 +26,8 @@ Owner INTEGER REFERENCES Users,
 ParentID INTEGER,
 ChildCounter Integer Not NULL, --TODEL? zawiera liczbe niezakonczonych synow tego zadania
 Done INTEGER NOT NULL, --TODO poprawic typ
-CreatedOn DATE NOT NULL,
-LastChange DATE NOT NULL
+CreatedOn INTEGER NOT NULL,
+LastChange INTEGER NOT NULL
 );
 
 
