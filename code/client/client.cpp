@@ -3,8 +3,9 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 
 #include "protocol/proto.h"
 #include <assert.h>
@@ -41,7 +42,6 @@ int conn()
 	struct addrinfo addr_hints;
 	struct addrinfo *addr_result;
 
-	char buffer[BUFFER_SIZE];
 	size_t len;
 	ssize_t len2;
 

@@ -12,6 +12,21 @@ using namespace std;
 #include "serwer.h"
 #include "protocol/proto.h"
 
+string Server::generateSalt()
+{
+	FILE *random = fopen("/dev/urandom", "rb");
+	string salt;
+	for(int i = 0; i < 20; i++)
+	{
+		unsigned char c;
+		fread(&c, sizeof(c), 1, random);
+		c %= 95; // mamy 95 drukowalnych znakow ascii
+		c += 0x20; // pierwszy na pozycji 0x20
+		salt += c;
+	}
+	return salt;
+}
+
 void Server::serveClient(int sock)
 {
 	Client client(sock);
@@ -23,13 +38,39 @@ void Server::serveClient(int sock)
 				return;
 			break;
 		case CTS_REGISTER:
-			//registerClient(client);
+			registerClient(client);
 			return;
 			break;
 		default:
 			// wysylamy info o bledzie
 			return;
 	}
+}
+
+bool Server::loginClient(Client client)
+{
+	Client::LoginDetails loginDetails = client.getLoginDetails();
+	// szukamy usera w bazie
+	printf("Proba zalogowania uzytkownika %s:%s\n", loginDetails.username.c_str(), loginDetails.password.c_str());
+	if(loginDetails.username == "test" && loginDetails.password == "testowa")
+	{
+		printf("Sukces\n");
+		client.loginOK();
+		return true;
+	}
+	else
+	{
+		printf("Porazka\n");
+		client.loginFailed();
+		return false;
+	}
+}
+
+bool Server::registerClient(Client client)
+{
+	Client::RegisterDetails registerDetails = client.getRegisterDetails();
+	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
+	client.registerOK();
 }
 
 void Server::Listen()
@@ -71,29 +112,4 @@ void Server::Listen()
 
 }
 
-bool Server::loginClient(Client client)
-{
-	Client::LoginDetails loginDetails = client.getLoginDetails();
-	// szukamy usera w bazie
-	printf("Proba zalogowania uzytkownika %s:%s\n", loginDetails.username.c_str(), loginDetails.password.c_str());
-	if(loginDetails.username == "test" && loginDetails.password == "testowa")
-	{
-		printf("Sukces\n");
-		client.loginOK();
-		return true;
-	}
-	else
-	{
-		printf("Porazka\n");
-		client.loginFailed();
-		return false;
-	}
-}
-
-/*bool Server::registerClient(Client client)
-{
-	cts_register_details registerDetails = client.getRegisterDetails();
-	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
-	client.registerOK();
-}*/
 

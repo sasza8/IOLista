@@ -14,8 +14,16 @@ public:
 		string password;
 	};
 	
+	struct RegisterDetails
+	{
+		string username;
+		string password;
+		// inne - e-mail itp.
+	}
+	
 	
 	LoginDetails getLoginDetails();
+	RegisterDetails getLoginDetails();
 	void loginOK();
 	void loginFailed();
 	void registerOK();
