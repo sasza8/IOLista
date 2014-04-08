@@ -99,6 +99,7 @@ void wyswietl_pomocnicza(const int sock, int number) {
 		struct stc_task task;
 		// TODO - tutaj moze inicjalizacja? 
 		// id na 0, name na FAIL albo cos takiego
+		recv(sock, &task, sizeof(task), 0);
 		printf("ID: %d\n"
 				"DESCRIPTION: %s\n"
 				"OWNER: N/A\n"
