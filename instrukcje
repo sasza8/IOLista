@@ -1,0 +1,20 @@
+przygotowanie bazy danych:
+cd code/serwer
+sqlite3 testowa.db
+>.read ../baza.sql
+
+kompilacja podprogramow:
+make w code/serwer, code/database i code/client
+
+testowanie:
+cd code/serwer
+bin/Serwer
+i na innej karcie:
+cd code/client
+./client 127.0.0.1 16661
+
+kolejna iteracja:
+usprawnienie serwera (protokół zużywający mniej sieci, kontrola błędów,
+reszta funkcjonalności)
+wstępna wersja aplikacji klienckiej na windows (bez ładnego wyglądu, ale używalna)
+migracja na normalną bazę danych (np. oracle lub mysql)
