@@ -302,27 +302,4 @@ std::vector<ListDatabase::ListTask> ListDatabase::getSubTasksList(UserID_t user,
 }
 
 
-int main()
-{
-	ListDatabase x = ListDatabase("hehe");
-	//x.addUser("pikaczu32", "aa", "aa", "aa", "aa", "aa");
-	auto z = x.getUser("pikaczu32");
-	cout << z.id << "   " << z.login << "  " << z.email << std::endl;
-	
-	auto vect =  x.getTasks(z.id);
-	cout << vect.size();
-	
-	
-	for(int i =0; i< vect.size(); ++i)
-	{
-		auto tmp = vect.at(i);
-		cout << "bum bum " << tmp.id << "  " << tmp.description << "   " << tmp.parent_id << "   " << tmp.created_on << std::endl;
-	}
-	
-	
-	return 0;
-	
-}
-
-
 

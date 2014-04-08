@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <string>
+#include <cstring>
 using namespace std;
 
 Client::Client(int sock) : sock(sock) {}
@@ -21,7 +22,7 @@ void Client::setUserDetails(ListDatabase::ListUser dbUser)
 
 Client::LoginDetails Client::getLoginDetails()
 {
-	int type = getType();
+	unsigned type = getType();
 	if(type != CTS_LOGIN_DETAILS);
 		// wyjateczek
 	cts_login_details details;
@@ -34,7 +35,7 @@ Client::LoginDetails Client::getLoginDetails()
 
 Client::RegisterDetails Client::getRegisterDetails()
 {
-	int type = getType();
+	unsigned type = getType();
 	if(type != CTS_REGISTER_DETAILS);
 		// wyjateczek
 	cts_register_details details;
@@ -48,7 +49,7 @@ Client::RegisterDetails Client::getRegisterDetails()
 Client::TaskDetails Client::getTaskDetails()
 {
 	cts_add_task details;
-	recv(sock, &details, sizeof(details), 0)
+	recv(sock, &details, sizeof(details), 0);
 	
 	Client::TaskDetails ret;
 	ret.description = details.description;
@@ -90,7 +91,33 @@ void Client::registerOK()
 	sendType(STC_REGISTER_OK);
 }
 
+void Client::startSendingTasks(int number)
+{
+	sendType(STC_START_TASKS);
+	stc_start_tasks details;
+	details.number = number;
+	send(sock, &details, sizeof(details), 0);
+}
+
+void Client::sendTask(ListDatabase::ListTask task)
+{
+	stc_task details;
+	details.id = task.id;
+	strncpy(details.description, task.description.c_str(), sizeof(details.description)-1);
+	// TODO: przesylac dane o ownerze, trzeba je wyciagnac z bazy
+	details.done = task.done;
+	details.createdon = task.created_on;
+	details.lastchange = task.last_change;
+	
+	send(sock, &details, sizeof(details), 0);
+}
+
 unsigned Client::getID()
 {
 	return userDetails.id;
+}
+
+string Client::getUsername()
+{
+	return userDetails.login;
 }

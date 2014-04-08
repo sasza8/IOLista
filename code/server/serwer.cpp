@@ -62,7 +62,7 @@ void Server::serveClient(int sock)
 				addTask(client);
 				break;
 			case CTS_GET_TASKS:
-				listTasks(client);
+				getTasks(client);
 				break;
 		}
 	}
@@ -105,7 +105,7 @@ bool Server::registerClient(Client &client)
 {
 	Client::RegisterDetails registerDetails = client.getRegisterDetails();
 	// dopisujemy sobie usera w bazie, sprawdzamy czy konfliktuje itp. itp.
-	client.registerOK();
+	//client.registerOK();
 	return true;
 }
 
@@ -114,6 +114,20 @@ bool Server::addTask(Client &client)
 	Client::TaskDetails taskDetails = client.getTaskDetails();
 	db.addTask(taskDetails.description, client.getID(), taskDetails.parent, false);
 	return true;
+}
+
+bool Server::getTasks(Client &client)
+{
+	int parent = client.getTasksParent();
+	vector < ListDatabase::ListTask > tasks;
+	if(parent == -1)
+		tasks = db.getLists(client.getID());
+	else
+		tasks = db.getSubTasksList(client.getID(), parent);
+	
+	client.startSendingTasks(tasks.size());
+	for(auto task : tasks)
+		client.sendTask(task);
 }
 
 Server::Server() : db("testowa.db")
