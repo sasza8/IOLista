@@ -32,6 +32,7 @@ class ListDatabase
 public:
 	class ListUser
 	{
+	public:
 		UserID_t* id;
 		Text_t login;
 		Text_t pass;
@@ -45,6 +46,8 @@ public:
 		
 		void getID(sqlite3* db); //!!! Pewnie wywali sie przy wspolbieznosci
 	public:
+		ListUser(){
+		id = new UserID_t();};
 		ListUser(Text_t login, Text_t pass, Text_t salt,
 				Text_t f_name, Text_t l_name, Text_t email) :
 				id(nullptr), login(login), pass(pass), salt(salt), //TODO wyifowac maxy
@@ -70,7 +73,7 @@ public:
 		void getID(sqlite3* db);
 	public:
 		ListTask(Text_t description, UserID_t* owner_id, TaskParent_t* parent_id, 
-					TaskDone_t done, DateType created_at) : 
+					TaskDone_t done) : 
 					id(nullptr), description(description), owner_id(owner_id), 
 					parent_id(parent_id), child_ct(0), done(done) {};
 		
@@ -98,6 +101,11 @@ public:
 	
 	ListUser addUser(Text_t login, Text_t pass, Text_t salt,
 				Text_t f_name, Text_t l_name, Text_t email); //dodaje i zwraca usera
+	
+	ListUser getUser(Text_t login);
+	
+	/*ListTask addTask(Text_t description, UserID_t* owner_id, TaskParent_t* parent_id, 
+					TaskDone_t done */
 				
 	/*
 	bool canChange(ListUser user, ListTask task);
@@ -109,6 +117,8 @@ public:
 		
 
 private:
+	static int getUserCallback(void *data, int argc, char **argv, char **azColName);
+
 	std::string name;
 	sqlite3* db;
 };

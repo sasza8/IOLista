@@ -1,7 +1,3 @@
-//#include <sqlite3.h>
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
 #include <iostream>
 
 
@@ -32,16 +28,6 @@ void ListDatabase::close()
 {
 	sqlite3_close(db);
 }
-
-
-/*
-UserID_t* id;
-		Text_t login;
-		Text_t pass;
-		Text_t salt;
-		Text_t f_name;
-		Text_t l_name;
-		Text_t email;*/
 
 
 
@@ -96,23 +82,67 @@ void ListDatabase::ListTask::getID(sqlite3* db)
 
 
 
-void ListDatabase::ListTask::insert(sqlite3* db)
+/*void ListDatabase::ListTask::insert(sqlite3* db)
 { //TODO injctions!!! 
-	/*char *zErrMsg = 0;
+	char *zErrMsg = 0;
 	std::ostringstream oss;
-	oss << "INSERT INTO Tasks (Description, Owner, ParentID, ChildCounter, Done, CreatedOn, LastChange) "
-	"VALUES ('"<< description <<"'," << owner_id ? owner_id : "NULL" << ","
-	<< parent_id ? parent_id : "NULL" << "," << child_ct << "," << done << "," << "CURRENT_TIMESTAMP,CURRENT_TIMESTAMP" <<");";
-	if(sqlite3_exec(db, oss.str().c_str(), nothing, 0, &zErrMsg)!= SQLITE_OK )
+	oss << "INSERT INTO Tasks (Description, Owner, ParentID, ChildCounter, Done, CreatedOn, LastChange) VALUES ('"
+	<< description <<"',";
+	if(owner_id != nullptr)
+		oss << *owner_id;
+	else
+		oss << "NULL";
+	oss << ",";
+	if(parent_id != nullptr)
+		oss << *parent_id;
+	else
+		oss << "NULL";
+	oss << "," << child_ct << "," << done << "," << "CURRENT_TIMESTAMP,CURRENT_TIMESTAMP" <<");";
+	
+	std::cout << oss.str() << std::endl;
+	
+	/*if(sqlite3_exec(db, oss.str().c_str(), nothing, 0, &zErrMsg)!= SQLITE_OK )
 	{
 		fprintf(stderr, "SQL error: %s\n", zErrMsg);
 		sqlite3_free(zErrMsg);
-	}
-	oss.clear();
-	getID(db);*/
+	}*/
+	//oss.clear();
+	//getID(db);
+//}
+
+
+
+int ListDatabase::getUserCallback(void *data, int argc, char **argv, char **azColName)
+{
+	ListUser* tmp = (ListUser*) data;
+	*(tmp->id) = atoi(argv[0]);
+	tmp->login = argv[1];
+	tmp->pass = argv[2];
+	tmp->salt = argv[3];
+	tmp->f_name = argv[4];
+	tmp->l_name = argv[5];
+	tmp->email = argv[6];
+	return 0;
 }
 
 
+
+ListDatabase::ListUser ListDatabase::getUser(Text_t login)
+{
+	open();
+	char *zErrMsg = 0;
+	int rc;
+
+	ListUser* data = new ListUser();
+	std::ostringstream oss;
+	oss << "SELECT * FROM Users WHERE Login = '" << login << "';";
+	
+	//std::cout << oss.str() << std::endl;
+	
+	rc = sqlite3_exec(db, oss.str().c_str(), getUserCallback, (void*)data, &zErrMsg);
+	close();
+	return *data;
+}
 
 
 
@@ -121,8 +151,10 @@ void ListDatabase::ListTask::insert(sqlite3* db)
 int main()
 {
 	ListDatabase x = ListDatabase("hehe");
-	x.addUser("pikaczu32", "aa", "aa", "aa", "aa", "aa");
-} */
+	//x.addUser("pikaczu32", "aa", "aa", "aa", "aa", "aa");
+	auto z = x.getUser("pikaczu32");
+	cout << *z.id << "   " << z.login << "  " << z.email << std::endl;
+}
 
-
+*/
 
