@@ -1,0 +1,16 @@
+na windowsie:
+mysql ( http://dev.mysql.com/downloads/windows/installer/ zainstalowalem wszystko)
+
+odpalic workbench
+zalogowac sie
+lewy dolny rog, jak jest wylistowane schemas
+na losowego prawym
+Create Schema
+name = list
+apply
+w edytorze usunac CREATE SCHEMA `list` ;
+wkleic zawartosc baza.sql
+polskie znaki powinny dzialac
+
+
+biblioteka pythona : http://www.lfd.uci.edu/~gohlke/pythonlibs/ wyszukaj mysql-python
