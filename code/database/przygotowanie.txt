@@ -1,4 +1,6 @@
-na windowsie:
+robilem to na windowsie powinno byc przenosne:
+Python 2.7
+
 mysql ( http://dev.mysql.com/downloads/windows/installer/ zainstalowalem wszystko)
 
 odpalic workbench
