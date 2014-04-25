@@ -1,0 +1,15 @@
+D:\INFORMATYKA\IOLista\code\client\client\bin\Debug\client.exe.config
+D:\INFORMATYKA\IOLista\code\client\client\bin\Debug\client.exe
+D:\INFORMATYKA\IOLista\code\client\client\bin\Debug\client.pdb
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client.csprojResolveAssemblyReference.cache
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\App.g.cs
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client_MarkupCompile.cache
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client.g.resources
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client.Properties.Resources.resources
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client.csproj.GenerateResource.Cache
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client.exe
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\client.pdb
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\mainwindow.baml
+D:\INFORMATYKA\IOLista\code\client\client\obj\Debug\mainwindow.g.cs
+D:\INFORMATYKA\IOLista\code\client\client\bin\Debug\Newtonsoft.Json.dll
+D:\INFORMATYKA\IOLista\code\client\client\bin\Debug\Newtonsoft.Json.xml
