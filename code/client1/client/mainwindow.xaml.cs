@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Newtonsoft.Json;
+
 
 namespace client
 {
@@ -80,9 +82,13 @@ namespace client
                 response = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
                 Console.WriteLine("Received: {0}", response);
 
+                // konwertujemy JSONa na klase ServerResponse
+                ServerPackets.ServerResponse responseJsn =
+                    JsonConvert.DeserializeObject<ServerPackets.ServerResponse>(response);
+
                 // TODO - nowe okno przy pomyslnym zalogowaniu + przekazanie
                 // nazwy uzytkownika itp
-                if (response.Equals(ServerPackets.ServerResponse.LOGIN_OK))
+                if (responseJsn.type.Equals(ServerPackets.ServerResponse.LOGIN_OK))
                     MessageBox.Show("Zalogowano pomyslnie");
                 else
                     MessageBox.Show("BLad w logowaniu");

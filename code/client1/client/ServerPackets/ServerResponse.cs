@@ -11,11 +11,11 @@ namespace client.ServerPackets
         public string type { get; set; }
 
         // LOGOWANIE
-        public static string LOGIN_OK = "loginOk";
+        public static string LOGIN_OK = "loginOK";
         public static string LOGIN_FAILED = "loginFailed";
 
         // REJESTROWANIE
-        public static string REGISTER_OK = "registerOk";
+        public static string REGISTER_OK = "registerOK";
         public static string REGISTER_FAILED = "registerFailed";
     }
 }
