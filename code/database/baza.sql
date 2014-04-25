@@ -23,7 +23,7 @@ CREATE TABLE `list`.`tasks` (
   `Owner` INT UNSIGNED NOT NULL,
   `ParentID` BIGINT UNSIGNED NULL COMMENT 'wskazuje na nadrzednego Taska',
   `Parents` TEXT NULL COMMENT 'string zawierajacy liste id ojcow',
-  `Done` BIT NOT NULL COMMENT '0 - trwa' /* comment truncated */ /*1 - zakonczone*/,
+  `Done` INT UNSIGNED NOT NULL COMMENT '0 - trwa' /* comment truncated */ /*1 - zakonczone*/,
   `CreatedOn` DATETIME NOT NULL,
   `LastChange` DATETIME NOT NULL,
   PRIMARY KEY (`TaskID`),
