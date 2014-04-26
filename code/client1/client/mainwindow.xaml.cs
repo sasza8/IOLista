@@ -14,7 +14,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using Newtonsoft.Json;
 
 
 namespace client
@@ -59,45 +58,61 @@ namespace client
             string password = passwordBox.Password;
             Console.Write("login: {0}", username);
             Console.Write("pasword: {0}", password);
-
             try
             {
-                string json =
-                    ServerPackets.Authenticate.json(username, password);
-                // Translate the passed message into ASCII and store it as a Byte array.
-                Byte[] data = System.Text.Encoding.ASCII.GetBytes(json);   
-
-                //InvalidOperationException - client niepolaczony
-                //ObjectDisposedException - client zostal zamkniety
                 NetworkStream stream = client.GetStream();
+                string json =
+                    Protocol.jsonAuthenticate(username, password);
 
-                stream.Write(data, 0, data.Length);
+                Protocol.sendToServer(stream, json);
 
-                //teraz odpowiedz serwera
-                data = new byte[1024];
-                String response = String.Empty;
+                String response = Protocol.recieveFromServer(stream);
 
-                // Read the first batch of the TcpServer response bytes.
-                Int32 bytes = stream.Read(data, 0, data.Length);
-                response = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                Console.WriteLine("Received: {0}", response);
-
-                // konwertujemy JSONa na klase ServerResponse
-                ServerPackets.ServerResponse responseJsn =
-                    JsonConvert.DeserializeObject<ServerPackets.ServerResponse>(response);
-
-                // TODO - nowe okno przy pomyslnym zalogowaniu + przekazanie
-                // nazwy uzytkownika itp
-                if (responseJsn.type.Equals(ServerPackets.ServerResponse.LOGIN_OK))
-                    MessageBox.Show("Zalogowano pomyslnie");
-                else
-                    MessageBox.Show("BLad w logowaniu");
-
+                checkAuthentication(username, response);
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Error in LOGIN : {0}", ex);
             }
+        }
+
+        private void btnRegister_Click(object sender, RoutedEventArgs e)
+        {
+            Register window = new Register(client);
+            window.Show();
+//              // TESTTT
+//            string jsnTest = @"{
+//                'type': '" + ServerResponse.LOGIN_OK + @"',
+//                'token': 'blablablaTOKEN',
+//            }";
+
+//            Dictionary<String, String> d =
+//                JsonConvert.DeserializeObject<Dictionary<String, String>>(jsnTest);
+
+//            Console.WriteLine("Type: {0}", d[ServerResponse.TYPE]);
+//            checkAuthentication("Pablo", jsnTest);
+        }
+
+
+        // **                 PRIVATE FUNCTIONS             **/
+        // ***************************************************/
+
+        private void checkAuthentication(String username, String serverResponse)
+        {
+            // konwertujemy JSONa na klase Slownik
+            Dictionary<String, String> dictionary =
+                Protocol.jsonToDictionary(serverResponse);
+
+            if (dictionary[Protocol.TYPE].Equals(Protocol.LOGIN_OK))
+            {
+                LoggedHome window = new LoggedHome(username, dictionary["token"]);
+                window.Show();
+                this.Close();
+            }              
+            else // TUTAJ ewentualne sprawdzanie czy LOGIN_FAIL i nowy else - zly pakiet :(
+            {
+                MessageBox.Show("Blad w logowaniu");
+            }               
         }
 
     } // window class

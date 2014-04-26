@@ -28,3 +28,7 @@ D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\client_MarkupCompile.cache
 D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\client.g.resources
 D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\client.Properties.Resources.resources
 D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\client.csproj.GenerateResource.Cache
+D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\LoggedHome.baml
+D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\LoggedHome.g.cs
+D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\Register.baml
+D:\INFORMATYKA\IOLista\code\client1\client\obj\Debug\Register.g.cs

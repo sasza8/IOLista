@@ -1,0 +1,21 @@
+﻿<Window x:Class="client.Register"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Register" Height="491.343" Width="655.223">
+    <Grid>
+        <TextBlock x:Name="txtBlockUsername" HorizontalAlignment="Left" Margin="129,84,0,0" TextWrapping="Wrap" Text="Username" VerticalAlignment="Top" RenderTransformOrigin="-1.041,-0.817" Width="105" Height="23"/>
+        <TextBlock x:Name="txtBlockFirstName" HorizontalAlignment="Left" Margin="129,118,0,0" TextWrapping="Wrap" Text="First name" VerticalAlignment="Top" Height="22" Width="105"/>
+        <TextBlock x:Name="txtBlockLastName" HorizontalAlignment="Left" Margin="129,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" RenderTransformOrigin="-0.245,-1.243" Height="23" Width="105"><Run Text="Last name"/></TextBlock>
+        <TextBlock x:Name="txtBlockEmail" HorizontalAlignment="Left" Margin="129,183,0,0" TextWrapping="Wrap" Text="E-mail" VerticalAlignment="Top" Height="23" Width="105"/>
+        <TextBlock x:Name="txtBlockPassword1" HorizontalAlignment="Left" Margin="129,226,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Height="17" Width="105"/>
+        <TextBlock x:Name="txtBlockPassword2" HorizontalAlignment="Left" Margin="129,267,0,0" TextWrapping="Wrap" Text="Password" VerticalAlignment="Top" Height="18" Width="105"/>
+        <TextBox x:Name="txtBoxUsername" HorizontalAlignment="Left" Height="23" Margin="267,84,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="199"/>
+        <TextBox x:Name="txtBoxFirstName" HorizontalAlignment="Left" Height="23" Margin="267,117,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="199"/>
+        <TextBox x:Name="txtBoxLastName" HorizontalAlignment="Left" Height="23" Margin="267,150,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="199" RenderTransformOrigin="-0.059,0.566"/>
+        <TextBox x:Name="txtBoxEmail" HorizontalAlignment="Left" Height="23" Margin="267,183,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="199"/>
+        <PasswordBox x:Name="passwordBox1" HorizontalAlignment="Left" Margin="267,226,0,0" VerticalAlignment="Top" Height="18" Width="199"/>
+        <PasswordBox x:Name="passwordBox2" HorizontalAlignment="Left" Margin="267,267,0,0" VerticalAlignment="Top" Width="199"/>
+        <Button x:Name="btnSubmit" Content="Submit" HorizontalAlignment="Left" Margin="129,347,0,0" VerticalAlignment="Top" Width="105" Height="29" Click="btnSubmit_Click"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="361,347,0,0" VerticalAlignment="Top" Width="105" Height="29" Click="btnCancel_Click"/>
+    </Grid>
+</Window>
