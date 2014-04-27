@@ -1,10 +1,23 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
 import datetime
+import _mysql_exceptions
 
 #TODO: sensowne tworzenie warunkow,
 #TODO: ogolny __SELECT__
 #TODO: ogolny __UPDATE__
+
+
+class DBIntegrityError(_mysql_exceptions.IntegrityError):
+    pass
+
+
+class DBConnectionError(_mysql_exceptions.OperationalError):
+    pass
+
+
+class DBError(Exception):
+    pass
 
 
 class Database:
@@ -39,12 +52,20 @@ class Database:
         sql += u", ".join(tmp)
         sql += u");"  #sql == INSERT INTO <table_name> (<columns>) VALUES (%(column)s);
 
-        conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_)
+        try:
+            conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_)
+        except _mysql_exceptions.OperationalError:
+            raise DBConnectionError()
+        except Exception as e:
+            raise DBError()
+
         with conn:
             cur = conn.cursor()
             cur.execute("set names utf8;")
-
-            cur.executemany(sql, values)
+            try:
+                cur.executemany(sql, values)
+            except _mysql_exceptions.IntegrityError as e:
+                raise DBIntegrityError(e.args[1])
             m_id = cur.lastrowid
         return m_id
 
@@ -128,7 +149,7 @@ class Database:
 
 
         """
-        columns = [unicode("UserId").encode("utf-8"),
+        columns = [unicode("UserID").encode("utf-8"),
                    unicode("Login").encode("utf-8"),
                    unicode("Password").encode("utf-8"),
                    unicode("Salt").encode("utf-8"),
@@ -179,7 +200,7 @@ class Database:
         if tmp is not None:
             condition = (con_str, con_args)
 
-        x = self.__SELECT__(columns, u'tasks', condition, ret_columns)
+        x = self.__SELECT__(columns, u'users', condition, ret_columns)
         return x
 
     def select_tasks(self, task_id=None, description=None, owner=None, parent_id=None, parents=None, done=None, created_at=None,
