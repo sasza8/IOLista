@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+// do testow
+using Newtonsoft.Json;
 
 
 namespace client
@@ -49,6 +51,7 @@ namespace client
                 // FIXME
                 // tutaj ewentualne wyjscie z programu/ wlaczenie trybu offline
                 Console.WriteLine("SocketException / WrongPort : {0}", ex);
+                //MessageBox.Show("Nie udalo sie polaczyc z serwerem :(");
             }
         }
 
@@ -65,9 +68,7 @@ namespace client
                     Protocol.jsonAuthenticate(username, password);
 
                 Protocol.sendToServer(stream, json);
-
-                String response = Protocol.recieveFromServer(stream);
-
+                string response = Protocol.recieveFromServer(stream);
                 checkAuthentication(username, response);
             }
             catch (Exception ex)
@@ -78,19 +79,19 @@ namespace client
 
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            Register window = new Register(client);
-            window.Show();
-//              // TESTTT
-//            string jsnTest = @"{
-//                'type': '" + ServerResponse.LOGIN_OK + @"',
-//                'token': 'blablablaTOKEN',
-//            }";
+            //Register window = new Register(client);
+            //window.Show();
+            // TESTTT
+            string jsnTest = @"{
+                'type': '" + Protocol.LOGIN_OK + @"',
+                'token': 'blablablaTOKEN',
+            }";
 
-//            Dictionary<String, String> d =
-//                JsonConvert.DeserializeObject<Dictionary<String, String>>(jsnTest);
+            Dictionary<String, String> d =
+                JsonConvert.DeserializeObject<Dictionary<String, String>>(jsnTest);
 
-//            Console.WriteLine("Type: {0}", d[ServerResponse.TYPE]);
-//            checkAuthentication("Pablo", jsnTest);
+            Console.WriteLine("Type: {0}", d["type"]);
+            checkAuthentication("Pablo", jsnTest);
         }
 
 
@@ -99,13 +100,14 @@ namespace client
 
         private void checkAuthentication(String username, String serverResponse)
         {
+            
             // konwertujemy JSONa na klase Slownik
             Dictionary<String, String> dictionary =
                 Protocol.jsonToDictionary(serverResponse);
 
-            if (dictionary[Protocol.TYPE].Equals(Protocol.LOGIN_OK))
+            if (dictionary["type"].Equals(Protocol.LOGIN_OK))
             {
-                LoggedHome window = new LoggedHome(username, dictionary["token"]);
+                LoggedHome window = new LoggedHome(username, dictionary["token"], client);
                 window.Show();
                 this.Close();
             }              
@@ -113,6 +115,40 @@ namespace client
             {
                 MessageBox.Show("Blad w logowaniu");
             }               
+        }
+
+        private void btnTest_Click(object sender, RoutedEventArgs e)
+        {
+            string json = @"{
+  'description': 'opis bla bla bla',
+  'releaseDate': '1995-4-7T00:00:00',
+    'lastModificationDate': '1995-4-7T00:00:00',
+    'done' : 'False',
+  'subTasks': [
+{  'description': 'OPIS WEWNATRZ',
+  'releaseDate': '1995-4-7T00:00:00',
+    'lastModificationDate': '1995-4-7T00:00:00',
+    'done' : 'False',
+  'subTasks': []},
+  ]
+}";
+            Task task =
+                JsonConvert.DeserializeObject<Task>(json);
+            Console.WriteLine("{0}", task.description);
+                Console.WriteLine("{0}", task.createOn);
+                Console.WriteLine("{0}", task.lastChange);
+                Console.WriteLine("{0}", task.done);
+                Console.WriteLine("{0}", task.subtasks[0].description);
+
+                Task t = new Task();
+                t.description = "test desc";
+                t.lastChange = "jakasData";
+                t.createOn = "innaData";
+                t.done = true;
+                    //t.subtasks = new Task[10];
+                t.subtasks.Add(task);
+                string jsonString = JsonConvert.SerializeObject(t);
+                Console.WriteLine("{0}", jsonString);
         }
 
     } // window class

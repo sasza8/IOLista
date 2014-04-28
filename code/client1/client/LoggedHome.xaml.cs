@@ -12,6 +12,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using System.Net.Sockets;
+using Newtonsoft.Json;
+
 namespace client
 {
     /// <summary>
@@ -21,13 +24,61 @@ namespace client
     {
         private String username;
         private String token;
+        private TcpClient client;
 
-        public LoggedHome(String _username, String _token)
+        UberTask uberTask;
+
+        public LoggedHome(string _username, string _token, TcpClient _client)
         {
             InitializeComponent();
             username = _username;
             token = _token;
+            client = _client;
         }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            // FIXME
+            // gdy okienko sie wczyta to wysyłamy rządanie o
+            // pierwsza warstwe taskow!
+            listViewTasks.Items.Add(new Task
+            {
+                id = 1,
+                createOn = "dzisiaj",
+                lastChange = "mnute temu",
+                done = false,
+                parent = 1,
+                description = @"
+                taki tam opis projektu, kpic cos"
+            });
+            listViewTasks.Items.Add(new Task
+            {
+                id = 2,
+                createOn = "wczoraj",
+                lastChange = "teraz",
+                done = true,
+                parent = 2,
+                description = @"
+                BLA BLA BLA BLA ploooo"
+            });
+            try
+            {
+                NetworkStream stream = client.GetStream();
+                string msg = Protocol.jsonSubtasks(-1);
+                Protocol.sendToServer(stream, msg);
+                string response = Protocol.recieveFromServer(stream);
+                uberTask = JsonConvert.DeserializeObject<UberTask>(response);
+                // TODO
+                // mamy juz uberTask, teraz trzeba go jakos wyswietlic
+            }
+            catch
+            {
+                // TODO
+                Console.WriteLine("BLAD w LOADED");
+            }
+        }
+
+
 
     } // class
 } // namespace

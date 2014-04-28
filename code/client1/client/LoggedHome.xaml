@@ -1,8 +1,20 @@
 ﻿<Window x:Class="client.LoggedHome"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="LoggedHome" Height="300" Width="492.537">
-    <Grid>
-        
+        Title="LoggedHome" Height="441.53" Width="915.225">
+    <Grid Loaded="Grid_Loaded">
+        <ListView x:Name="listViewTasks" Height="391" Margin="10,10,143,0" VerticalAlignment="Top">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="ID" DisplayMemberBinding="{Binding id}" Width="40"/>
+                    <GridViewColumn Header="parent" DisplayMemberBinding="{Binding parent}" Width="70"/>
+                    <GridViewColumn Header="create" DisplayMemberBinding="{Binding createOn}" Width="70"/>
+                    <GridViewColumn Header="last change" DisplayMemberBinding="{Binding lastChange}" Width="100"/>
+                    <GridViewColumn Header="done" DisplayMemberBinding="{Binding done}" Width="70"/>
+                    <GridViewColumn Header="description" DisplayMemberBinding="{Binding description}" Width="400"/>
+                </GridView>
+            </ListView.View>
+            <Button Height="97" Width="100"/>
+        </ListView>
     </Grid>
 </Window>

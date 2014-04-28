@@ -39,21 +39,17 @@ namespace client
             // TUTAJ prawdopodobnie validacja formy i wyswietlenie uzytkownikowi
             // co wpisal zle
             // validateForm()
-            String username, firstName, lastName, email, password;
+            string username, email, password;
             username = txtBoxUsername.Text;
-            firstName = txtBoxFirstName.Text;
-            lastName = txtBoxLastName.Text;
             email = txtBoxEmail.Text;
             password = passwordBox1.Password;
             try 
             {
                 NetworkStream stream = client.GetStream();
-                String jsn = Protocol.jsonRegister(username, firstName,
-                     lastName, email, password);           
+                string jsn = Protocol.jsonRegister(username, email, password);           
 
                 Protocol.sendToServer(stream, jsn);
-                String response = Protocol.recieveFromServer(stream);
-
+                string response = Protocol.recieveFromServer(stream);
                 checkRegistration(response);
             }
             catch (Exception ex)
@@ -78,7 +74,7 @@ namespace client
         {
             Dictionary<String, String> dict =
                 Protocol.jsonToDictionary(serverResponse);
-            String type = dict[Protocol.TYPE];
+            String type = dict["type"];
             if(type.Equals(Protocol.REGISTER_OK))
             {
                 // TODO
