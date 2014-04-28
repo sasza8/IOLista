@@ -7,7 +7,7 @@ import _mysql_exceptions
 
 """
 _names_ zamienia uzywane identyfikatory na nazwy kolumn w bazie danych
-_inv_names_ hest odwroceniem _names_
+_inv_names_ jest odwroceniem _names_
 """
 
 _names_ = dict(user_id=u"UserID",
@@ -204,8 +204,13 @@ class Database:
             sql += condition.get_string()
             args = condition.get_arguments()
         sql += u";"
-        conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_,
-                               db=self._db_, cursorclass=MySQLdb.cursors.DictCursor, use_unicode=True, charset="utf8")
+        try:
+            conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_,
+                                   use_unicode=True, charset="utf8")
+        except _mysql_exceptions.OperationalError:
+            raise DBConnectionError()
+        except Exception as e:
+            raise DBError()
         z = []
         with conn:
             cur = conn.cursor()
@@ -281,27 +286,133 @@ class Database:
         if not condition.get_string():
             condition = None
 
-        return self.__SELECT__(columns, u'users', condition)
+        return self.__SELECT__(columns, u'have_access', condition)
 
     def __UPDATE__(self, set_values, table_name, condition):
         sql = u"UPDATE "
         sql += unicode(table_name).encode("utf-8")
         sql += u" SET "
-        sql += unicode(set_values[0]).encode("utf-8")
-        args = set_values[1]
+        args = [dict()]
+        tmp = []
+        i = 0
+        for name, value in set_values:
+            tmp.append(_names_[name] + u"=%(val" + unicode(i) + u")s")
+            args[0].update({u"val" + unicode(i): value})
+            i += 1
         if condition is not None:
             sql += u" WHERE "
-            sql += condition[0]
-            args[0].update(condition[1][0])
+            sql += condition.get_string()
+            args[0].update(condition.get_arguments().items())
+
         sql += u";"
-        conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_)
+        try:
+            conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_,
+                                   use_unicode=True, charset="utf8")
+        except _mysql_exceptions.OperationalError:
+            raise DBConnectionError()
+        except Exception as e:
+            raise DBError()
+
         with conn:
             cur = conn.cursor()
             cur.execute("set names utf8;")
             cur.executemany(sql, args)
 
-    def update_users(self, **kwargs):
-        set_values_
+    def update_users_and(self, **kwargs):
+        """
+        c__<name> - wartosc bedzie w warunku (tylko AND)
+        <name>__gt/lt/lte ... - nierownosc warunku
+        """
+        condition = Condition()
+        set_vals = dict()
+        for name, value in kwargs:
+            if name.startswith("c__"):
+                name = name[3:]
+                condition.AND(**{name: value})
+            else:
+                set_vals.update({name: value})
+
+        self.__UPDATE__(set_vals, u"users", condition)
+
+    def update_users_or(self, **kwargs):
+        """
+        c__<name> - wartosc bedzie w warunku (tylko AND)
+        <name>__gt/lt/lte ... - nierownosc warunku
+        """
+        condition = Condition()
+        set_vals = dict()
+        for name, value in kwargs:
+            if name.startswith("c__"):
+                name = name[3:]
+                condition.OR(**{name: value})
+            else:
+                set_vals.update({name: value})
+
+        self.__UPDATE__(set_vals, u"users", condition)
+
+    def update_tasks_and(self, **kwargs):
+        """
+        c__<name> - wartosc bedzie w warunku (tylko AND)
+        <name>__gt/lt/lte ... - nierownosc warunku
+        """
+        condition = Condition()
+        set_vals = dict()
+        for name, value in kwargs:
+            if name.startswith("c__"):
+                name = name[3:]
+                condition.AND(**{name: value})
+            else:
+                set_vals.update({name: value})
+
+        self.__UPDATE__(set_vals, u"tasks", condition)
+
+    def update_tasks_or(self, **kwargs):
+        """
+        c__<name> - wartosc bedzie w warunku (tylko AND)
+        <name>__gt/lt/lte ... - nierownosc warunku
+        """
+        condition = Condition()
+        set_vals = dict()
+        for name, value in kwargs:
+            if name.startswith("c__"):
+                name = name[3:]
+                condition.OR(**{name: value})
+            else:
+                set_vals.update({name: value})
+
+        self.__UPDATE__(set_vals, u"tasks", condition)
+
+    def update_access_and(self, **kwargs):
+        """
+        c__<name> - wartosc bedzie w warunku (tylko AND)
+        <name>__gt/lt/lte ... - nierownosc warunku
+        """
+        condition = Condition()
+        set_vals = dict()
+        for name, value in kwargs:
+            if name.startswith("c__"):
+                name = name[3:]
+                condition.AND(**{name: value})
+            else:
+                set_vals.update({name: value})
+
+        self.__UPDATE__(set_vals, u"have_access", condition)
+
+    def update_access_or(self, **kwargs):
+        """
+        c__<name> - wartosc bedzie w warunku (tylko AND)
+        <name>__gt/lt/lte ... - nierownosc warunku
+        """
+        condition = Condition()
+        set_vals = dict()
+        for name, value in kwargs:
+            if name.startswith("c__"):
+                name = name[3:]
+                condition.OR(**{name: value})
+            else:
+                set_vals.update({name: value})
+
+        self.__UPDATE__(set_vals, u"have_access", condition)
 
     def can_save(self, user_id, task_id):
         # TODO
