@@ -61,37 +61,15 @@ class EmailAlreadyInUse(WrongData):
 #
 
 
-#NIE ZNAM SIE NA TYM TODO
-
 def gen_salt():
-    """
-    TODO
-    zwraca losowego stringa dodawanego do hasla w celu generowania silnego hasha
-    """
     salt = "".join([ chr( (ord(char)%94) + 33) for char in os.urandom(12)])
     return salt
 
 
 def gen_hash(password, salt):
     import hashlib
-    """
-    TODO
-    zwraca hasha ktorego bedziemy trzymac w bazie
-    """
     hash = hashlib.sha1(password+salt).hexdigest()
     return hash
-
-
-def get_password(my_hash, salt):
-    """
-    TODO
-    odkodowuje trzymanego w bazie hasha (tj password)
-    """
-    return my_hash
-
-
-#
-#
 
 
 class DatabaseApi:
@@ -103,7 +81,7 @@ class DatabaseApi:
         """
         self._database_ = Database(db_user, db_pass, db_host, db_name)
 
-    def create_user(self, login, password, email, first_name=None, last_name=None):
+    def create_user(self, login, password, email):
         """
         tworzy nowego uzytkownika i zwraca jego id
         wyjatki:
@@ -118,7 +96,7 @@ class DatabaseApi:
 
         try:
             my_id = self._database_.insert_user(login=login, password=my_hash, salt=salt, first_name=first_name,
-                                                last_name=last_name, email=email)
+                                                email=email)
         except database.DBIntegrityError as e:
             if "Login" in e.args[0]:
                 raise LoginAlreadyInUse()
@@ -153,8 +131,8 @@ class DatabaseApi:
         if not tmp:
             return None
 
-        my_pass = get_password(my_hash=tmp[0]["password"], salt=tmp[0]["salt"])
-        if my_pass != password:
+        my_pass = gen_hash(password=password, salt=tmp[0]["salt"])
+        if my_pass != tmp[0]["password"]:
             raise WrongData()
 
         to_ret = dict(login=tmp[0]["login"],
