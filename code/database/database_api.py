@@ -153,12 +153,12 @@ class DatabaseApi:
         my_pass = get_password(my_hash=tmp[0]["password"], salt=tmp[0]["salt"])
         if my_pass != password:
             raise WrongData()
-
-        if first_name != tmp[0]["first_name"]:
-            raise WrongData()
-
-        if last_name != tmp[0]["last_name"]:
-            raise WrongData()
+        if first_name is not None:
+            if first_name != tmp[0]["first_name"]:
+                raise WrongData()
+        if last_name is not None:
+            if last_name != tmp[0]["last_name"]:
+                raise WrongData()
 
         to_ret = dict(login=tmp[0]["login"],
                       password=tmp[0]["password"],
