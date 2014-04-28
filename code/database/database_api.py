@@ -96,8 +96,7 @@ class DatabaseApi:
         my_hash = gen_hash(password=password, salt=salt)
 
         try:
-            my_id = self._database_.insert_user(login=login, password=my_hash, salt=salt, first_name=first_name,
-                                                email=email)
+            my_id = self._database_.insert_user(login=login, password=my_hash, salt=salt, email=email)
         except database.DBIntegrityError as e:
             if "Login" in e.args[0]:
                 raise LoginAlreadyInUse()
