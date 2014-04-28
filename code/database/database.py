@@ -73,24 +73,24 @@ class Condition:
     def AND(self, **kwargs):
         if self._str_ == u"":
             for name, value in kwargs.items():
-                self.__insert__({name: value})
+                self.__insert__(**{name: value})
                 self._str_ += u" AND "
             self._str_ = self._str_[:-5]
         else:
             for name, value in kwargs.items():
                 self._str_ += u" AND "
-                self.__insert__({name: value})
+                self.__insert__(**{name: value})
 
     def OR(self, **kwargs):
         if self._str_ == u"":
             for name, value in kwargs.items():
-                self.__insert__({name: value})
+                self.__insert__(**{name: value})
                 self._str_ += u" OR "
             self._str_ = self._str_[:-4]
         else:
             for name, value in kwargs.items():
                 self._str_ += u" OR "
-                self.__insert__({name: value})
+                self.__insert__(**{name: value})
 
     def get_string(self):
         return self._str_
@@ -145,7 +145,8 @@ class Database:
         sql += u");"  #sql == INSERT INTO <table_name> (<columns>) VALUES (%(column)s);
 
         try:
-            conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_)
+            conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_,
+                                   use_unicode=True, charset="utf8")
         except _mysql_exceptions.OperationalError:
             raise DBConnectionError()
         except Exception as e:
@@ -204,7 +205,7 @@ class Database:
             args = condition.get_arguments()
         sql += u";"
         conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_,
-                               db=self._db_, cursorclass=MySQLdb.cursors.DictCursor)
+                               db=self._db_, cursorclass=MySQLdb.cursors.DictCursor, use_unicode=True, charset="utf8")
         z = []
         with conn:
             cur = conn.cursor()
@@ -234,7 +235,7 @@ class Database:
                 continue
             columns.append(_names_[name])
             if value is not None:
-                condition.AND({name: value})
+                condition.AND(**{name: value})
 
         if not condition.get_string():
             condition = None
