@@ -1,7 +1,102 @@
 # -*- coding: utf-8 -*-
 import MySQLdb
+import MySQLdb.cursors
 import datetime
 import _mysql_exceptions
+
+
+"""
+_names_ zamienia uzywane identyfikatory na nazwy kolumn w bazie danych
+_inv_names_ hest odwroceniem _names_
+"""
+
+_names_ = dict(user_id=u"UserID",
+               login=u"Login",
+               password=u"Password",
+               salt=u"Salt",
+               first_name=u"FirstName",
+               last_name=u"LastName",
+               email=u"Email",
+
+               task_id=u"TaskId",
+               description=u"Description",
+               owner=u"Owner",
+               done=u"Done",
+               created_at=u"CreatedOn",
+               last_change=u"LastChange",
+               parent_id=u"ParentID",
+               parents=u"Parents",
+
+               permissions_flag=u"Permissions",
+               )
+
+_inv_names_ = dict((v, k) for k, v in _names_.iteritems())
+
+
+class Condition:
+    _str_ = u""
+    _args_ = dict()
+    _counter_ = 0
+    # TODO nawiasowanie w AND i OR
+    # TODO konkatenacja bylaby fajna
+
+    def __insert__(self, **kwargs):
+        i = 0
+        for name, value in kwargs.items():
+            if i > 0:
+                raise TypeError()
+            i += 1
+            if name.endswith(u"__lt"):
+                self._str_ += _names_[name[:-4]]
+                self._str_ += u"<"
+            elif name.endswith(u"__lte"):
+                self._str_ += _names_[name[:-5]]
+                self._str_ += u"<="
+            elif name.endswith(u"__gt"):
+                self._str_ += _names_[name[:-4]]
+                self._str_ += u">"
+            elif name.endswith(u"__gte"):
+                self._str_ += _names_[name[:-5]]
+                self._str_ += u">="
+            else:
+                self._str_ += _names_[name]
+                self._str_ += u"="
+            self._str_ += u"%(con" + unicode(self._counter_) + u")s"
+            self._args_.update({u"con" + unicode(self._counter_): value})
+            self._counter_ += 1
+
+    def __init__(self):
+        self._str_ = u""
+        self._args_ = dict()
+        self._counter_ = 0
+
+    def AND(self, **kwargs):
+        if self._str_ == u"":
+            for name, value in kwargs.items():
+                self.__insert__({name: value})
+                self._str_ += u" AND "
+            self._str_ = self._str_[:-5]
+        else:
+            for name, value in kwargs.items():
+                self._str_ += u" AND "
+                self.__insert__({name: value})
+
+    def OR(self, **kwargs):
+        if self._str_ == u"":
+            for name, value in kwargs.items():
+                self.__insert__({name: value})
+                self._str_ += u" OR "
+            self._str_ = self._str_[:-4]
+        else:
+            for name, value in kwargs.items():
+                self._str_ += u" OR "
+                self.__insert__({name: value})
+
+    def get_string(self):
+        return self._str_
+
+    def get_arguments(self):
+        return [self._args_]
 
 #TODO: sensowne tworzenie warunkow,
 #TODO: ogolny __SELECT__
@@ -32,24 +127,21 @@ class Database:
         self._host_ = db_host
         self._db_ = db_name
 
-    def __INSERT__(self, table_name, values):
+    def __INSERT__(self, table_name, **kwargs):
         sql = u"INSERT INTO " + table_name.encode("utf-8") + "("
-        tmp = []
-        for k in values:
-            for i, j in k.iteritems():
-                tmp.append(i)
-        sql += u",".join(tmp)
+        columns = []
+        for name, value in kwargs.items():
+            columns.append(_names_[name])
+        sql += u",".join(columns)
         sql += u") VALUES ("
-        tmp = []
-        for k in values:
-            for i, j in k.iteritems():
-                if j != unicode(u'NOW()').encode("utf-8"):
-                    tmp.append(u"%(" + unicode(i).encode("utf-8") + u")s")
-                elif j == unicode(u'NULL').encode("utf-8"):
-                    tmp.append(u'NULL')
-                else:
-                    tmp.append(u'NOW()')
-        sql += u", ".join(tmp)
+        columns = []
+        args = [dict()]
+        i = 0
+        for name, value in kwargs.items():
+            columns.append(u"%(val" + unicode(i) + u")s")
+            args[0].update({u"val" + unicode(i): value})
+            i += 1
+        sql += u", ".join(columns)
         sql += u");"  #sql == INSERT INTO <table_name> (<columns>) VALUES (%(column)s);
 
         try:
@@ -63,70 +155,56 @@ class Database:
             cur = conn.cursor()
             cur.execute("set names utf8;")
             try:
-                cur.executemany(sql, values)
+                cur.executemany(sql, args)
             except _mysql_exceptions.IntegrityError as e:
                 raise DBIntegrityError(e.args[1])
             m_id = cur.lastrowid
         return m_id
 
     def insert_user(self, login, password, salt, first_name, last_name, email):
-        vals = [dict(Login=login.encode("utf-8"),
-                     Password=password.encode("utf-8"),
-                     Salt=salt.encode("utf-8"),
-                     FirstName=first_name.encode("utf-8"),
-                     LastName=last_name.encode("utf-8"),
-                     Email=email.encode("utf-8"))]
-        return self.__INSERT__(u"users", vals)
+        return self.__INSERT__(u"users", login=login, password=password, salt=salt, first_name=first_name,
+                               last_name=last_name, email=email)
 
-    def insert_task(self, description, owner, parent_id='NULL', parents='NULL', done=0, created_at=None,
+    def insert_task(self, description, owner, parent_id=None, parents=None, done=0, created_at=None,
                     last_change=None):
         if created_at is None:
             created_at = datetime.datetime.now()
         if last_change is None:
             last_change = created_at
-        vals = [dict(Description=unicode(description).encode("utf-8"),
-                     Owner=int(owner),
-                     Done=int(done),
-                     CreatedOn=created_at,
-                     LastChange=last_change)]
-        if parent_id != 'NULL':
-            vals[0].update({'ParentID': int(parent_id)})
-        if parents != 'NULL':
-            vals[0].update({'Parents': unicode(parents).encode("utf-8")})
-        return self.__INSERT__(u"tasks", vals)
+        return self.__INSERT__(u"tasks", description=description, owner=owner, parent_id=parent_id, parents=parents,
+                               done=done, created_at=created_at, last_change=last_change)
 
     def insert_access(self, task_id, user_id, permissions_flag):
-         """
+        """
         nalezy ustalic co jaka flaga znaczy,
         mozna podawac wszystko co unicode zamieni do sensownych postaci
         task_id->bigint unsigned
         user_id->int unsigned
         permissions_flag-> int unsigned
-         """
-         vals = [dict(TaskID=unicode(task_id).encode("utf-8"),
-                      UserID=unicode(user_id).encode("utf-8"),
-                      Permissions=unicode(permissions_flag)("utf-8"))]
-         return self.__INSERT__(u"have_access", vals)
-
-    def __SELECT__(self, columns, table_name, condition, ret_columns):
         """
-        condition tuple (string z %s, slownik argumentow jak w insert)
-        columns slownik
+        return self.__INSERT__(u"have_access", task_id=task_id, user_id=user_id, permissions_flag=permissions_flag)
+
+    def __SELECT__(self, columns, table_name, condition):
+        """
+        condition - instancja klasy Condition
+        columns - wybierane kolumny
         """
         sql = u"SELECT "
         tmp = []
-        for c in columns:
-            tmp.append(c)
+        for col in columns:
+            tmp.append(col)
         sql += u", ".join(tmp)
         sql += u" FROM "
         sql += unicode(table_name).encode("utf-8")
+
         args = [dict()]
         if condition is not None:
             sql += u" WHERE "
-            sql += condition[0]
-            args = condition[1]
+            sql += condition.get_string()
+            args = condition.get_arguments()
         sql += u";"
-        conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_)
+        conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_,
+                               db=self._db_, cursorclass=MySQLdb.cursors.DictCursor)
         z = []
         with conn:
             cur = conn.cursor()
@@ -137,169 +215,92 @@ class Database:
         to_ret = []
         for row in z:
             n_row = dict()
-            for idx, val in enumerate(row):
-                n_row.update({ret_columns[idx]: val})
+            for name, value in row.items():
+                n_row.update({_inv_names_[name]: value})
             to_ret.append(n_row)
         return to_ret
 
     def select_users(self, user_id=None, login=None, password=None, salt=None, first_name=None, last_name=None,
                      email=None):
         """
-        tuple of tuples
-
-
+        zwraca liste slownikow
         """
-        columns = [unicode("UserID").encode("utf-8"),
-                   unicode("Login").encode("utf-8"),
-                   unicode("Password").encode("utf-8"),
-                   unicode("Salt").encode("utf-8"),
-                   unicode("FirstName").encode("utf-8"),
-                   unicode("LastName").encode("utf-8"),
-                   unicode("Email").encode("utf-8")
-                   ]
-        ret_columns = [unicode("user_id").encode("utf-8"),
-                       unicode("login").encode("utf-8"),
-                       unicode("password").encode("utf-8"),
-                       unicode("salt").encode("utf-8"),
-                       unicode("first_name").encode("utf-8"),
-                       unicode("last_name").encode("utf-8"),
-                       unicode("email").encode("utf-8"),]
-        tmp = None
-        str_tmp = []
-        con_args = [dict()]
-        if user_id is not None:
-            str_tmp.append(u"UserID=%(con1)s".encode("utf-8"))
-            con_args[0] = dict(dict(con1=unicode(user_id).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if login is not None:
-            str_tmp.append(u"Login=%(con2)s".encode("utf-8"))
-            con_args[0] = dict(dict(con2=unicode(login).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if password is not None:
-            str_tmp.append(u"Password=%(con3)s".encode("utf-8"))
-            con_args[0] = dict(dict(con3=unicode(password).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if salt is not None:
-            str_tmp.append(u"Salt=%(con4)s".encode("utf-8"))
-            con_args[0] = dict(dict(con4=unicode(salt).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if first_name is not None:
-            str_tmp.append(u"FirstName=%(con5)s".encode("utf-8"))
-            con_args[0] = dict(dict(con5=unicode(first_name).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if last_name is not None:
-            str_tmp.append(u"LastName=%(con6)s".encode("utf-8"))
-            con_args[0] = dict(dict(con6=unicode(last_name).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if email is not None:
-            str_tmp.append(u"Email=%(con7)s".encode("utf-8"))
-            con_args[0] = dict(dict(con7=unicode(email).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        con_str = u" AND ".join(str_tmp)
-        condition = None
-        if tmp is not None:
-            condition = (con_str, con_args)
+        f_args = locals()
+        columns = []
+        condition = Condition()
 
-        x = self.__SELECT__(columns, u'users', condition, ret_columns)
-        return x
+        for name, value in f_args.items(): #TODO zrobic to ladniej w tym momencie stworzenie zmiennej przed ta petla wyjebie kod
+            if name == 'self' or name == 'f_args' or name == 'columns' or name == 'condition':
+                continue
+            columns.append(_names_[name])
+            if value is not None:
+                condition.AND({name: value})
 
-    def select_tasks(self, task_id=None, description=None, owner=None, parent_id=None, parents=None, done=None, created_at=None,
-                     last_change=None):
-        columns = [unicode("TaskId").encode("utf-8"),
-                   unicode("Description").encode("utf-8"),
-                   unicode("Owner").encode("utf-8"),
-                   unicode("ParentID").encode("utf-8"),
-                   unicode("Parents").encode("utf-8"),
-                   unicode("Done").encode("utf-8"),
-                   unicode("CreatedOn").encode("utf-8"),
-                   unicode("LastChange").encode("utf-8"),
-                   ]
-        ret_columns = [unicode("task_id").encode("utf-8"),
-                       unicode("description").encode("utf-8"),
-                       unicode("owner").encode("utf-8"),
-                       unicode("parent_id").encode("utf-8"),
-                       unicode("parents").encode("utf-8"),
-                       unicode("done").encode("utf-8"),
-                       unicode("created_at").encode("utf-8"),
-                       unicode("last_change").encode("utf-8"),
-                       ]
-        tmp = None
-        str_tmp = []
-        con_args = [dict()]
-        if task_id is not None:
-            str_tmp.append(u"TaskId=%(con0)s".encode("utf-8"))
-            con_args[0] = dict(dict(con0=task_id).items() + con_args[0].items())
-            tmp = 1
-        if description is not None:
-            str_tmp.append(u"Description=%(con1)s".encode("utf-8"))
-            con_args[0] = dict(dict(con1=unicode(description).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if owner is not None:
-            str_tmp.append(u"Owner=%(con2)s".encode("utf-8"))
-            con_args[0] = dict(dict(con2=owner).items() + con_args[0].items())
-            tmp = 1
-        if parent_id is not None:
-            str_tmp.append(u"ParentID=%(con3)s".encode("utf-8"))
-            con_args[0] = dict(dict(con3=parent_id).items() + con_args[0].items())
-            tmp = 1
-        if parents is not None:
-            str_tmp.append(u"Parents=%(con4)s".encode("utf-8"))
-            con_args[0] = dict(dict(con4=unicode(parents).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if done is not None:
-            str_tmp.append(u"Done=%(con5)s".encode("utf-8"))
-            con_args[0] = dict(dict(con5=done).items() + con_args[0].items())
-            tmp = 1
-        if created_at is not None:
-            str_tmp.append(u"CreatedOn=%(con6)s".encode("utf-8"))
-            con_args[0] = dict(dict(con6=created_at).items() + con_args[0].items())
-            tmp = 1
-        if last_change is not None:
-            str_tmp.append(u"LastChange=%(con7)s".encode("utf-8"))
-            con_args[0] = dict(dict(con7=last_change).items() + con_args[0].items())
-            tmp = 1
-        con_str = u" AND ".join(str_tmp)
-        condition = None
-        if tmp is not None:
-            condition = (con_str, con_args)
+        if not condition.get_string():
+            condition = None
 
-        x = self.__SELECT__(columns, u'tasks', condition, ret_columns)
-        return x
+        return self.__SELECT__(columns, u'users', condition)
+
+    def select_tasks(self, task_id=None, description=None, owner=None, parent_id=None, parents=None, done=None,
+                     created_at=None, last_change=None):
+        """
+        zwraca liste slownikow
+        """
+        f_args = locals()
+        columns = []
+        condition = Condition()
+
+        for name, value in f_args.items(): #TODO zrobic to ladniej w tym momencie stworzenie zmiennej przed ta petla wyjebie kod
+            if name == 'self' or name == 'f_args' or name == 'columns' or name == 'condition':
+                continue
+            columns.append(_names_[name])
+            if value is not None:
+                condition.AND({name: value})
+
+        if not condition.get_string():
+            condition = None
+
+        return self.__SELECT__(columns, u'tasks', condition)
 
     def select_access(self, task_id=None, user_id=None, permissions_flag=None):
-        columns = [unicode("TaskID").encode("utf-8"),
-                   unicode("UserID").encode("utf-8"),
-                   unicode("Permissions").encode("utf-8")
-                   ]
-        ret_columns = [unicode("task_id").encode("utf-8"),
-                       unicode("user_id").encode("utf-8"),
-                       unicode("permissions_flag").encode("utf-8")
-                       ]
-        tmp = None
-        str_tmp = []
-        con_args = [dict()]
-        if task_id is not None:
-            str_tmp.append(u"TaskID=%(con1)s".encode("utf-8"))
-            con_args[0] = dict(dict(con1=unicode(task_id).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if user_id is not None:
-            str_tmp.append(u"UserID=%(con2)s".encode("utf-8"))
-            con_args[0] = dict(dict(con2=unicode(user_id).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        if permissions_flag is not None:
-            str_tmp.append(u"Permissions=%(con3)s".encode("utf-8"))
-            con_args[0] = dict(dict(con3=unicode(permissions_flag).encode("utf-8")).items() + con_args[0].items())
-            tmp = 1
-        con_str = u" AND ".join(str_tmp)
-        condition = None
-        if tmp is not None:
-            condition = (con_str, con_args)
+        """
+        zwraca liste slownikow
+        """
+        f_args = locals()
+        columns = []
+        condition = Condition()
 
-        x = self.__SELECT__(columns, u'users', condition, ret_columns)
-        return x
+        for name, value in f_args.items(): #TODO zrobic to ladniej w tym momencie stworzenie zmiennej przed ta petla wyjebie kod
+            if name == 'self' or name == 'f_args' or name == 'columns' or name == 'condition':
+                continue
+            columns.append(_names_[name])
+            if value is not None:
+                condition.AND({name: value})
 
-    def __UPDATE__(self, columns, values, condition):
-        return -1
+        if not condition.get_string():
+            condition = None
+
+        return self.__SELECT__(columns, u'users', condition)
+
+    def __UPDATE__(self, set_values, table_name, condition):
+        sql = u"UPDATE "
+        sql += unicode(table_name).encode("utf-8")
+        sql += u" SET "
+        sql += unicode(set_values[0]).encode("utf-8")
+        args = set_values[1]
+        if condition is not None:
+            sql += u" WHERE "
+            sql += condition[0]
+            args[0].update(condition[1][0])
+        sql += u";"
+        conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_)
+        with conn:
+            cur = conn.cursor()
+            cur.execute("set names utf8;")
+            cur.executemany(sql, args)
+
+    def update_users(self, **kwargs):
+        set_values_
 
     def can_save(self, user_id, task_id):
         # TODO
