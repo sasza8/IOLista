@@ -172,7 +172,7 @@ class DatabaseApi:
         zwraca liste slownikow widocznych dla danego usera
         (
         (slownik == wiersz, etykiey jak w naglowku)
-
+        zwraca co widzisz + pole w slowniku mowiace czy mozesz edytpwac
         """
         parents = None
         return self._database_.select_tasks(task_id, description, owner, parent_id, parents, done, created_at,
