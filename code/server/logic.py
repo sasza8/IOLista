@@ -1,34 +1,25 @@
 import os
 import sys
 sys.path.append('../') # ustawiamy sciezke importu na folder code
-import database.database as database
-import hashlib
+import database.database_api as database_api
 
 class logicClass:
     def __init__(self):
         self.authenticatedUsers = dict()
-        self.db = database.Database()
+        self.db_api = database_api.DatabaseApi()
 
     def authenticate(self, username, password):
-        users = self.db.select_users(login=username)
-        if len(users) == 0:
+        user = self.db_api.get_user(login=username, password=password)
+        if user == None:
             return None
-        user = users[0]
-        dbid = user[0]
-        dbsalt = user[3]
-        dbpass = user[2]
-        passwordhash = hashlib.sha1(password+dbsalt).hexdigest()
-        if dbpass != passwordhash:
-            return None
+        id = user["user_id"]
         token = "".join([ chr( (ord(char)%94) + 33) for char in os.urandom(64)]) #generujemy 64 bajty i zamieniamy na drukowalne
-        self.authenticatedUsers[token] = dbid
+        self.authenticatedUsers[token] = id
         return token
 
-    def register(self, username, password, firstname, lastname, email):
+    def register(self, username, password, email):
         try:
-            salt = "".join([ chr( (ord(char)%94) + 33) for char in os.urandom(12)])
-            passwordhash = hashlib.sha1(password+salt).hexdigest()
-            self.db.insert_user(username, passwordhash, salt, firstname, lastname, email)
+            #self.db.insert_user(username, passwordhash, salt, email)
             return True
         except Exception as ex:
             print ex

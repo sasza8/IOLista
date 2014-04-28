@@ -26,11 +26,9 @@ class ServerProtocol(protocol.Protocol):
 
         username = params.get('username')
         password = params.get('password')
-        firstname = params.get('firstname')
-        lastname = params.get('lastname')
         email = params.get('email')
 
-        if self.serverLogic.register(username, password, firstname, lastname, email):
+        if self.serverLogic.register(username, password, email):
             result['type'] = 'registerOK'
         else:
             result['type'] = 'registerFailed' # tutaj mozna dorobic wyjatki na zajety email, zajetego uzytkownika, za slabe haslo itp.
@@ -74,7 +72,7 @@ class ServerProtocol(protocol.Protocol):
 
         except self.LoginRequiredException:
             result = dict()
-            result['type'] = 'loginRequired'
+            result['type'] = 'authenticationRequired'
             self.transport.write(json.dumps(result))
         except Exception as e:
             print e

@@ -68,15 +68,18 @@ def gen_salt():
     TODO
     zwraca losowego stringa dodawanego do hasla w celu generowania silnego hasha
     """
-    return "1"
+    salt = "".join([ chr( (ord(char)%94) + 33) for char in os.urandom(12)])
+    return salt
 
 
 def gen_hash(password, salt):
+    import hashlib
     """
     TODO
     zwraca hasha ktorego bedziemy trzymac w bazie
     """
-    return password
+    hash = hashlib.sha1(password+salt).hexdigest()
+    return hash
 
 
 def get_password(my_hash, salt):
