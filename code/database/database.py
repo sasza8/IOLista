@@ -157,6 +157,9 @@ class Database:
                 cur.executemany(sql, args)
             except _mysql_exceptions.IntegrityError as e:
                 raise DBIntegrityError(e.args[1])
+            except _mysql_exceptions.DataError as e:
+                raise DBIntegrityError("")
+
             m_id = cur.lastrowid
         return m_id
 
