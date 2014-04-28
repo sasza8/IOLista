@@ -26,7 +26,7 @@
       <file leaf-file-name="logic.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/logic.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="8" selection-start="471" selection-end="471" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="612">
+            <state line="31" column="87" selection-start="1121" selection-end="1121" vertical-scroll-proportion="0.0" vertical-offset="77" max-vertical-offset="697">
               <folding />
             </state>
           </provider>
@@ -35,7 +35,7 @@
       <file leaf-file-name="server.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="56" selection-start="874" selection-end="874" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1581">
+            <state line="64" column="58" selection-start="2068" selection-end="2068" vertical-scroll-proportion="0.0" vertical-offset="825" max-vertical-offset="1853">
               <folding />
             </state>
           </provider>
@@ -64,7 +64,7 @@
       <file leaf-file-name="database_api.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/../database/database_api.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="69" column="7" selection-start="1460" selection-end="1460" vertical-scroll-proportion="0.22895622" vertical-offset="1037" max-vertical-offset="4199">
+            <state line="110" column="25" selection-start="2416" selection-end="2416" vertical-scroll-proportion="-0.5080645" vertical-offset="2185" max-vertical-offset="4199">
               <folding>
                 <element signature="e#25#54#0" expanded="true" />
               </folding>
@@ -82,17 +82,17 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/server.py" />
         <option value="$PROJECT_DIR$/../database/database_api.py" />
         <option value="$PROJECT_DIR$/logic.py" />
+        <option value="$PROJECT_DIR$/server.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="10" />
-    <option name="y" value="5" />
-    <option name="width" value="1346" />
-    <option name="height" value="728" />
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1382" />
+    <option name="height" value="754" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -192,7 +192,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="5" width="1346" height="728" extended-state="0" />
+    <frame x="-8" y="-8" width="1382" height="754" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -200,7 +200,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24285714" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23645681" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -292,20 +292,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="56" selection-start="874" selection-end="874" vertical-scroll-proportion="0.0" vertical-offset="230" max-vertical-offset="1581">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/logic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="8" selection-start="471" selection-end="471" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="612">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../database/database.py">
       <provider selected="true" editor-type-id="text-editor">
         <state line="169" column="31" selection-start="5142" selection-end="5142" vertical-scroll-proportion="0.0" vertical-offset="2491" max-vertical-offset="7412">
@@ -315,9 +301,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/logic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="87" selection-start="1121" selection-end="1121" vertical-scroll-proportion="0.0" vertical-offset="77" max-vertical-offset="697">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="64" column="58" selection-start="2068" selection-end="2068" vertical-scroll-proportion="0.0" vertical-offset="672" max-vertical-offset="1853">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../database/database_api.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="69" column="7" selection-start="1460" selection-end="1460" vertical-scroll-proportion="0.22895622" vertical-offset="1037" max-vertical-offset="4199">
+        <state line="110" column="25" selection-start="2416" selection-end="2416" vertical-scroll-proportion="-0.5080645" vertical-offset="2185" max-vertical-offset="4199">
           <folding>
             <element signature="e#25#54#0" expanded="true" />
           </folding>

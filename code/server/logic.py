@@ -1,7 +1,7 @@
 import os
 import sys
 sys.path.append('../') # ustawiamy sciezke importu na folder code
-import database.database_api as database_api
+import database_api
 
 class logicClass:
     def __init__(self):
@@ -19,12 +19,17 @@ class logicClass:
 
     def register(self, username, password, email):
         try:
-            #self.db.insert_user(username, passwordhash, salt, email)
+            self.db_api.create_user(login=username, password=password, email=email)
             return True
         except Exception as ex:
             print ex
             return False
 
+    def getTasks(self, user, parent):
+        self.db_api.get_tasks(user_id=user,parent_id=parent)
+
+    def addTask(self, user, description, parent):
+        self.db_api.create_task(user_id=user, description=description, parent_id=parent)
 
     def getAuthenticatedUserId(self, token):
         user = self.authenticatedUsers.get(token)

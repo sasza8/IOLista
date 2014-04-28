@@ -37,16 +37,32 @@ class ServerProtocol(protocol.Protocol):
 
     def do_getTasks(self, params, user):
         result = dict()
-        parent = params.get('parent', -1)
+        parent = params.get('parent', None)
         tasks = self.serverLogic.getTasks(user, parent)
 
         result['type'] = 'tasksList'
+        result['subtasks'] = []
+        for task in tasks:
+            subtask = dict()
+            subtask["id"] = task["id"]
+            subtask["description"] = task["description"]
+            subtask["parent"] = task["parentId"]
+            subtask["done"] = task["done"]
+            subtask["createdOn"] = task["createdOn"]
+            subtask["lastChange"] = task["lastChange"]
+
+            result['subtasks'].append(subtask)
+
+        self.transport.write(json.dumps(result))
 
     def do_addTask(self, params, user):
         result = dict()
 
         description = params.get('description')
         parent = params.get('parent', None)
+        done = params.get('done', False)
+
+        self.serverLogic.addTask(user, description, parent)
 
     def dataReceived(self, data):
         try:
