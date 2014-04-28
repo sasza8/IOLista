@@ -100,7 +100,7 @@ class DatabaseApi:
         """
         self._database_ = Database(db_user, db_pass, db_host, db_name)
 
-    def create_user(self, login, password, first_name, last_name, email):
+    def create_user(self, login, password, email, first_name=None, last_name=None):
         """
         tworzy nowego uzytkownika i zwraca jego id
         wyjatki:
@@ -129,7 +129,7 @@ class DatabaseApi:
 
         return my_id
 
-    def get_user(self, login, password, first_name=None, last_name=None, email=None, user_id=None):
+    def get_user(self, login, password, email=None, user_id=None):
         """
         zwraca usera
         gdy podany email login moze byc none
@@ -153,17 +153,9 @@ class DatabaseApi:
         my_pass = get_password(my_hash=tmp[0]["password"], salt=tmp[0]["salt"])
         if my_pass != password:
             raise WrongData()
-        if first_name is not None:
-            if first_name != tmp[0]["first_name"]:
-                raise WrongData()
-        if last_name is not None:
-            if last_name != tmp[0]["last_name"]:
-                raise WrongData()
 
         to_ret = dict(login=tmp[0]["login"],
                       password=tmp[0]["password"],
-                      first_name=tmp[0]["first_name"],
-                      last_name=tmp[0]["last_name"],
                       email=tmp[0]["email"],
                       user_id=tmp[0]["user_id"])
 

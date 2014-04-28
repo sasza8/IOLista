@@ -8,8 +8,6 @@ CREATE TABLE `list`.`users` (
   `Login` VARCHAR(100) NOT NULL,
   `Password` VARCHAR(100) NOT NULL,
   `Salt` VARCHAR(100) NOT NULL,
-  `FirstName` VARCHAR(100) NOT NULL,
-  `LastName` VARCHAR(150) NOT NULL,
   `Email` VARCHAR(150) NOT NULL,
   PRIMARY KEY (`UserID`),
   UNIQUE INDEX `UserID_UNIQUE` (`UserID` ASC),

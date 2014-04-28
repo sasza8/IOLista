@@ -14,8 +14,6 @@ _names_ = dict(user_id=u"UserID",
                login=u"Login",
                password=u"Password",
                salt=u"Salt",
-               first_name=u"FirstName",
-               last_name=u"LastName",
                email=u"Email",
 
                task_id=u"TaskId",
@@ -162,9 +160,8 @@ class Database:
             m_id = cur.lastrowid
         return m_id
 
-    def insert_user(self, login, password, salt, first_name, last_name, email):
-        return self.__INSERT__(u"users", login=login, password=password, salt=salt, first_name=first_name,
-                               last_name=last_name, email=email)
+    def insert_user(self, login, password, salt, email):
+        return self.__INSERT__(u"users", login=login, password=password, salt=salt, email=email)
 
     def insert_task(self, description, owner, parent_id=None, parents=None, done=0, created_at=None,
                     last_change=None):
@@ -226,8 +223,7 @@ class Database:
             to_ret.append(n_row)
         return to_ret
 
-    def select_users(self, user_id=None, login=None, password=None, salt=None, first_name=None, last_name=None,
-                     email=None):
+    def select_users(self, user_id=None, login=None, password=None, salt=None, email=None):
         """
         zwraca liste slownikow
         """
