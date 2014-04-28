@@ -62,6 +62,7 @@ class EmailAlreadyInUse(WrongData):
 
 
 def gen_salt():
+    import os
     salt = "".join([ chr( (ord(char)%94) + 33) for char in os.urandom(12)])
     return salt
 
