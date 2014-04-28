@@ -1,6 +1,7 @@
 # -*- coding: UTF-8 -*-?
 from database import Database
 import database
+import datetime
 """
 zostana dodane wyjatki tylko musze ogarnac jak sie je robi :P
 aktualnie ich nie obsluguje wiec wyjatki bazy moga latac jak porabane
@@ -179,14 +180,18 @@ class DatabaseApi:
         DatabaseError jesli baza sie wywali
         WrongData jesli zostana podane bledne dane
         """
+
+
         parents = None
         if parent_id is None:
             parent_id = 'NULL'
         else:
-
             tmp = (self.get_tasks(user_id=user_id, task_id=parent_id))[0]["parents"]
             parents = tmp + " " + str(parent_id)
-        return self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id, parents=parents)
+        now = datetime.datetime.now()
+        self._database_.update_tasks_or(parents, last_change=now)
+        return self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id, parents=parents,
+                                           created_at=now)
 
     def get_tasks(self, user_id, task_id=None, description=None, owner=None, parent_id=None, done=None, created_at=None,
                   last_change=None):

@@ -206,7 +206,7 @@ class Database:
         sql += u";"
         try:
             conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_,
-                                   use_unicode=True, charset="utf8")
+                                   use_unicode=True, charset="utf8", cursorclass=MySQLdb.cursors.DictCursor)
         except _mysql_exceptions.OperationalError:
             raise DBConnectionError()
         except Exception as e:
@@ -261,7 +261,7 @@ class Database:
                 continue
             columns.append(_names_[name])
             if value is not None:
-                condition.AND({name: value})
+                condition.AND(**{name: value})
 
         if not condition.get_string():
             condition = None
@@ -281,7 +281,7 @@ class Database:
                 continue
             columns.append(_names_[name])
             if value is not None:
-                condition.AND({name: value})
+                condition.AND(**{name: value})
 
         if not condition.get_string():
             condition = None
@@ -295,14 +295,17 @@ class Database:
         args = [dict()]
         tmp = []
         i = 0
-        for name, value in set_values:
+        for name, value in set_values.items():
             tmp.append(_names_[name] + u"=%(val" + unicode(i) + u")s")
             args[0].update({u"val" + unicode(i): value})
             i += 1
+        sql += u",".join(tmp)
         if condition is not None:
             sql += u" WHERE "
             sql += condition.get_string()
-            args[0].update(condition.get_arguments().items())
+
+            for name, value in condition.get_arguments()[0].items():
+                args[0].update({name: value})
 
         sql += u";"
         try:
@@ -325,7 +328,7 @@ class Database:
         """
         condition = Condition()
         set_vals = dict()
-        for name, value in kwargs:
+        for name, value in kwargs.items():
             if name.startswith("c__"):
                 name = name[3:]
                 condition.AND(**{name: value})
@@ -341,7 +344,7 @@ class Database:
         """
         condition = Condition()
         set_vals = dict()
-        for name, value in kwargs:
+        for name, value in kwargs.items():
             if name.startswith("c__"):
                 name = name[3:]
                 condition.OR(**{name: value})
@@ -357,7 +360,7 @@ class Database:
         """
         condition = Condition()
         set_vals = dict()
-        for name, value in kwargs:
+        for name, value in kwargs.items():
             if name.startswith("c__"):
                 name = name[3:]
                 condition.AND(**{name: value})
@@ -366,21 +369,31 @@ class Database:
 
         self.__UPDATE__(set_vals, u"tasks", condition)
 
-    def update_tasks_or(self, **kwargs):
+    def update_tasks_or(self, parents=None, **kwargs):
         """
         c__<name> - wartosc bedzie w warunku (tylko AND)
         <name>__gt/lt/lte ... - nierownosc warunku
         """
         condition = Condition()
         set_vals = dict()
-        for name, value in kwargs:
+        for name, value in kwargs.items():
+            if name == "parents":
+                continue
             if name.startswith("c__"):
                 name = name[3:]
                 condition.OR(**{name: value})
             else:
                 set_vals.update({name: value})
-
-        self.__UPDATE__(set_vals, u"tasks", condition)
+        if not condition.get_string():
+            condition = None
+        if parents is not None:
+            if condition is None:
+                condition = Condition()
+            ints = parents.split()
+            for i in ints:
+                condition.OR(task_id=int(i))
+        if condition is not None:
+            self.__UPDATE__(set_vals, u"tasks", condition)
 
     def update_access_and(self, **kwargs):
         """
@@ -389,7 +402,7 @@ class Database:
         """
         condition = Condition()
         set_vals = dict()
-        for name, value in kwargs:
+        for name, value in kwargs.items():
             if name.startswith("c__"):
                 name = name[3:]
                 condition.AND(**{name: value})
@@ -405,7 +418,7 @@ class Database:
         """
         condition = Condition()
         set_vals = dict()
-        for name, value in kwargs:
+        for name, value in kwargs.items():
             if name.startswith("c__"):
                 name = name[3:]
                 condition.OR(**{name: value})
