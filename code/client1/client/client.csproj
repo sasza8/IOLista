@@ -34,6 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.6.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -59,9 +60,11 @@
     </ApplicationDefinition>
     <Compile Include="Classes\Protocol.cs" />
     <Compile Include="Classes\Task.cs" />
+    <Compile Include="Exceptions\couldNotAddNewTask.cs" />
     <Compile Include="LoggedHome.xaml.cs">
       <DependentUpon>LoggedHome.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Packet.cs" />
     <Compile Include="Register.xaml.cs">
       <DependentUpon>Register.xaml</DependentUpon>
     </Compile>

@@ -19,10 +19,13 @@
         <TreeView x:Name="treeViewTaskExplorer" HorizontalAlignment="Left" Height="346" Margin="10,43,0,0" VerticalAlignment="Top" Width="162">
             <TreeView.Resources>
                 <ContextMenu x:Key ="NodeContextMenu"  StaysOpen="true">
-                    <MenuItem x:Name="menuItemAddNewTask" Header="Add new task"/>
+                    <MenuItem x:Name="menuItemAddNewSubtask" Header="Add new subtask" Click="menuItemAddNewSubtask_Click"/>
+                    <MenuItem x:Name="menuItemBBBB" Header="Add new subtask..."/>
                     <MenuItem Header="Add..."/>
                     <MenuItem Header="Add..."/>
-                    <MenuItem Header="Add..."/>
+                </ContextMenu>
+                <ContextMenu x:Key ="RootMenu"  StaysOpen="true">
+                    <MenuItem x:Name="menuItemAddNewTask1" Header="Add new task" Click="menuItemAddNewTask1_Click"/>
                 </ContextMenu>
             </TreeView.Resources>
         </TreeView>
