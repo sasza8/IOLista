@@ -16,16 +16,31 @@ _names_ = dict(user_id=u"UserID",
                salt=u"Salt",
                email=u"Email",
 
-               task_id=u"TaskId",
+               task_id=u"TaskID",
                description=u"Description",
                owner=u"Owner",
                done=u"Done",
-               created_at=u"CreatedOn",
+               created_at=u"CreatedAt",
                last_change=u"LastChange",
                parent_id=u"ParentID",
-               parents=u"Parents",
+               name=u"Name",
 
-               permissions_flag=u"Permissions",
+               can_see=u"CanSee",
+               can_edit=u"CanEdit",
+
+               t_task_id=u"tasks.TaskID",
+               t_description=u"tasks.Description",
+               t_owner=u"tasks.Owner",
+               t_done=u"tasks.Done",
+               t_created_at=u"tasks.CreatedAt",
+               t_last_change=u"tasks.LastChange",
+               t_parent_id=u"tasks.ParentID",
+               t_name=u"tasks.Name",
+
+               h_user_id=u"have_access.UserID",
+               h_task_id=u"have_access.TaskID",
+               h_can_see=u"have_access.CanSee",
+               h_can_edit=u"have_access.CanEdit",
                )
 
 _inv_names_ = dict((v, k) for k, v in _names_.iteritems())
@@ -56,9 +71,18 @@ class Condition:
             elif name.endswith(u"__gte"):
                 self._str_ += _names_[name[:-5]]
                 self._str_ += u">="
+            elif name.endswith(u"__neq"):
+                self._str_ += _names_[name[:-5]]
+                if value:
+                    self._str_ += u"!="
+                else:
+                    self._str_ += u" is not "
             else:
                 self._str_ += _names_[name]
-                self._str_ += u"="
+                if value:
+                    self._str_ += u"="
+                else:
+                    self._str_ += u" is "
             self._str_ += u"%(con" + unicode(self._counter_) + u")s"
             self._args_.update({u"con" + unicode(self._counter_): value})
             self._counter_ += 1
@@ -166,24 +190,18 @@ class Database:
     def insert_user(self, login, password, salt, email):
         return self.__INSERT__(u"users", login=login, password=password, salt=salt, email=email)
 
-    def insert_task(self, description, owner, parent_id=None, parents=None, done=0, created_at=None,
+    def insert_task(self, name, owner, parent_id=None, done=0, created_at=None, description=None,
                     last_change=None):
         if created_at is None:
             created_at = datetime.datetime.now()
         if last_change is None:
             last_change = created_at
-        return self.__INSERT__(u"tasks", description=description, owner=owner, parent_id=parent_id, parents=parents,
-                               done=done, created_at=created_at, last_change=last_change)
+        return self.__INSERT__(u"tasks", description=description, owner=owner, parent_id=parent_id,
+                               done=done, created_at=created_at, last_change=last_change, name=name)
 
-    def insert_access(self, task_id, user_id, permissions_flag):
-        """
-        nalezy ustalic co jaka flaga znaczy,
-        mozna podawac wszystko co unicode zamieni do sensownych postaci
-        task_id->bigint unsigned
-        user_id->int unsigned
-        permissions_flag-> int unsigned
-        """
-        return self.__INSERT__(u"have_access", task_id=task_id, user_id=user_id, permissions_flag=permissions_flag)
+    def insert_access(self, task_id, user_id, can_see=1, can_edit=0):
+
+        return self.__INSERT__(u"have_access", task_id=task_id, user_id=user_id, can_see=can_see, can_edit=can_edit)
 
     def __SELECT__(self, columns, table_name, condition):
         """
@@ -246,8 +264,8 @@ class Database:
 
         return self.__SELECT__(columns, u'users', condition)
 
-    def select_tasks(self, task_id=None, description=None, owner=None, parent_id=None, parents=None, done=None,
-                     created_at=None, last_change=None):
+    def select_tasks(self, task_id=None, description=None, owner=None, parent_id=None, done=None,
+                     created_at=None, last_change=None, name=None):
         """
         zwraca liste slownikow
         """
@@ -267,7 +285,7 @@ class Database:
 
         return self.__SELECT__(columns, u'tasks', condition)
 
-    def select_access(self, task_id=None, user_id=None, permissions_flag=None):
+    def select_access(self, task_id=None, user_id=None, can_edit=None, can_see=None):
         """
         zwraca liste slownikow
         """
@@ -368,7 +386,7 @@ class Database:
 
         self.__UPDATE__(set_vals, u"tasks", condition)
 
-    def update_tasks_or(self, parents=None, **kwargs):
+    def update_tasks_or(self, **kwargs):
         """
         c__<name> - wartosc bedzie w warunku (tylko AND)
         <name>__gt/lt/lte ... - nierownosc warunku
@@ -376,23 +394,12 @@ class Database:
         condition = Condition()
         set_vals = dict()
         for name, value in kwargs.items():
-            if name == "parents":
-                continue
             if name.startswith("c__"):
                 name = name[3:]
                 condition.OR(**{name: value})
             else:
                 set_vals.update({name: value})
-        if not condition.get_string():
-            condition = None
-        if parents is not None:
-            if condition is None:
-                condition = Condition()
-            ints = parents.split()
-            for i in ints:
-                condition.OR(task_id=int(i))
-        if condition is not None:
-            self.__UPDATE__(set_vals, u"tasks", condition)
+        self.__UPDATE__(set_vals, u"tasks", condition)
 
     def update_access_and(self, **kwargs):
         """
@@ -426,11 +433,18 @@ class Database:
 
         self.__UPDATE__(set_vals, u"have_access", condition)
 
-    def can_save(self, user_id, task_id):
-        # TODO
-        return True
+    def select_tasks_user(self, h_user_id, **kwargs):
+        f_args = locals()
+        columns = ["*"]
+        condition = Condition()
+        columns.append(_names_['h_user_id'])
+        condition.AND(**{'h_user_id': h_user_id})
 
-    def can_write(self, user_id, task_id):
-        # TODO
-        return True
+        for name, value in kwargs.items():
+            #columns.append(_names_[name])
+            condition.AND(**{name: value})
 
+        if not condition.get_string():
+            condition = None
+
+        return self.__SELECT__(columns, u'tasks INNER JOIN have_access ON tasks.TaskID = have_access.TaskID', condition)

@@ -142,7 +142,7 @@ class DatabaseApi:
 
         return to_ret
 
-    def create_task(self, user_id, description, parent_id=None):
+    def create_task(self, user_id, name, description=None, parent_id=None):
         """
         tworzy nowe podzadanie, zwraca jego indeks i aktualizuje baze
         wpisana data == datetime.datetime.now()
@@ -153,68 +153,82 @@ class DatabaseApi:
         DatabaseError jesli baza sie wywali
         WrongData jesli zostana podane bledne dane
         """
+        #TODO!!!!!!!!!!!!!!!!!!!!
 
-
-        parents = None
-        if parent_id is None:
-            parent_id = 'NULL'
-        else:
-            tmp = (self.get_tasks(user_id=user_id, task_id=parent_id))[0]["parents"]
-            parents = tmp + " " + str(parent_id)
         now = datetime.datetime.now()
-        self._database_.update_tasks_or(parents, last_change=now)
-        return self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id, parents=parents,
-                                           created_at=now)
 
-    def get_tasks(self, user_id, task_id=None, description=None, owner=None, parent_id=None, done=None, created_at=None,
-                  last_change=None):
+        task_id = self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id,
+                                              created_at=now, name=name)
+        self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=1, can_edit=1)
+        return task_id
+
+    def get_tasks(self, user_id, **kwargs):
         """
-        zwraca liste slownikow widocznych dla danego usera
+        zwraca liste taskow (jako slownik) widocznych dla danego usera
+        kluczem powinny być nazwy kolumn (patrz _names_ w database.py)
+        warunki:
+        - funkcja robi ANDa
+        - t_<kolumna> podkresla ze chodzi o tabele tasks
+        - h_<kolumna> podkresla ze chodzi o tabele z uprawnieniami (to join task z uprawnieniami na miejscu userid)
+        - <kolumna>__lt  - <
+        - <kolumna>__lte - <=
+        - <kolumna>__gt  - >
+        - <kolumna>__gte - >=
+        - <kolumna>      - =
+        - <kolumna>__neq - !=
         (
-        (slownik == wiersz, etykiey jak w naglowku)
-        zwraca co widzisz + pole w slowniku mowiace czy mozesz edytpwac
+        (slownik == wiersz, etykiey jak w datase.py _names_)
         """
-        parents = None
-        return self._database_.select_tasks(task_id, description, owner, parent_id, parents, done, created_at,
-                                            last_change)
+        return self._database_.select_tasks_user(user_id, can_see=1, **kwargs)
 
-    def task_is_up_to_date(self, user_id, task_id, last_change):
-        """
-        jesli podany last_change jest mniejszy od zapisanego w bazie danych zwraca wiersz (slownik) o tym id
-        w przeciwnym wypadku None
-        (TODO)
-        scenariusz: klient wysyla id korzenia  + swoja date zmiany do serwera
-        serwer:
-        tmp = task_is_up_to_date(task_id, last_change)
-        if tmp is not None:
-            odeslij tmp
-        else:
-            odeslij OK
-
-        jesli klient otrzyma slownik powinien wysłać do servera zapytania o wszystkich synów danego taska
-
-        NoAccess jesli uzytkownik nie mial prawa patrzec na tego taska
-        """
-        return None
-
-    def update_task(self, user_id, task_id, description=None, owner=None, parent_id=None, parents=None):
+    def update_task(self, user_id, task_id, name=None, description=None, owner=None, parent_id=None, done=None):
         """
         aktualizuje taska o podanym id, zmienia tylko podane pola (gdy wszystko jest None nie robi nic)
         (zmiana parenta przenosi "folder"
         (TODO)
         """
-        pass
+        tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
+        if tmp:
+            if tmp[0]["can_edit"] == 1:
+                self._database_.update_tasks_and(c_task_id=task_id, name=name, description=description, owner=owner,
+                                                 done=done, parent_id=parent_id)
+
 
     def can_edit(self, user_id, task_id):
         """
         sprawdza czy uzytkownik moze zmienic zadanie ( w tym dodac podzadanie)
         (TODO)
         """
-        return True
+        tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
+        if tmp:
+            if tmp[0]["can_edit"] == 1:
+                return True
+        return False
 
     def can_view(self, user_id, task_id):
         """
         sprawdza czy uzytkownik moze zobaczyc zadanie ( w tym dodac podzadanie)
         (TODO)
         """
-        return True
+        tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
+        if tmp:
+            if tmp[0]["can_see"] == 1:
+                return True
+        return False
+
+    def add_permission(self, task_id, user_id, can_see=0, can_edit=0):
+        """
+        can_edit implikuje can_see
+        """
+        #TODO!!!!!!!!!!!!!!!!!!!!!!!!
+        if can_see == 0 and can_edit == 0:
+            return
+        tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
+        if can_edit == 1:
+            can_see = 1
+
+        if tmp:
+            self._database_.update_access_and(c_task_id=task_id, c_user_id=user_id, can_see=can_see, can_edit=can_edit)
+        else:
+            self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=can_see)
+
