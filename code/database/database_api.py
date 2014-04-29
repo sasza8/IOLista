@@ -159,6 +159,12 @@ class DatabaseApi:
 
         task_id = self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id,
                                               created_at=now, name=name)
+        if parent_id is not None:
+            tmp = self._database_.select_access(task_id=parent_id)
+            for row in tmp:
+                self._database_.insert_access(task_id=task_id, user_id=row["user_id"], can_see=row["can_see"],
+                                              can_edit=row["can_edit"])
+
         self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=1, can_edit=1)
         return task_id
 
@@ -184,15 +190,19 @@ class DatabaseApi:
     def update_task(self, user_id, task_id, name=None, description=None, owner=None, parent_id=None, done=None):
         """
         aktualizuje taska o podanym id, zmienia tylko podane pola (gdy wszystko jest None nie robi nic)
-        (zmiana parenta przenosi "folder"
-        (TODO)
+        (zmiana parenta przenosi "folder")
+        i wlasnie tu rodzi sie problem
+        co jesli user a mial dostep do "folderu" A ale nie B
+        do folderu A dodalismy liste L (powiedzmy przez usera b)
+        user b przenosi L z A do B
+         czy user a powinien miec wciaz dostep do L?
+         (aktualnie ma)
         """
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
         if tmp:
             if tmp[0]["can_edit"] == 1:
                 self._database_.update_tasks_and(c_task_id=task_id, name=name, description=description, owner=owner,
                                                  done=done, parent_id=parent_id)
-
 
     def can_edit(self, user_id, task_id):
         """
@@ -216,13 +226,17 @@ class DatabaseApi:
                 return True
         return False
 
-    def add_permission(self, task_id, user_id, can_see=0, can_edit=0):
+    def add_permission(self, task_id, user_id, can_see=1, can_edit=0):
         """
         can_edit implikuje can_see
+        powiedzmy ze user a tworzy liste A
+        daje userowi b dostep do listy A
+        w liscie A user b dodaje liste B
+        user a zabiera dostep do listy A userowi b
+        czy b powinien miec dostep do D (aktualnie nie ma)
         """
         #TODO!!!!!!!!!!!!!!!!!!!!!!!!
-        if can_see == 0 and can_edit == 0:
-            return
+
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
         if can_edit == 1:
             can_see = 1
@@ -231,4 +245,9 @@ class DatabaseApi:
             self._database_.update_access_and(c_task_id=task_id, c_user_id=user_id, can_see=can_see, can_edit=can_edit)
         else:
             self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=can_see)
+
+        tmp = self._database_.select_tasks(parent_id=task_id)
+        for row in tmp:
+            self.add_permission(task_id=row["task_id"], user_id=user_id, can_see=can_see,can_edit=can_edit)
+
 
