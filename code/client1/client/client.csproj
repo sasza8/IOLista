@@ -66,6 +66,7 @@
       <DependentUpon>Register.xaml</DependentUpon>
     </Compile>
     <Compile Include="Classes\UberTask.cs" />
+    <Compile Include="Classes\TaskExplorer.cs" />
     <Page Include="LoggedHome.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
