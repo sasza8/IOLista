@@ -153,7 +153,7 @@ class DatabaseApi:
         DatabaseError jesli baza sie wywali
         WrongData jesli zostana podane bledne dane
         """
-        #TODO!!!!!!!!!!!!!!!!!!!!
+
 
         now = datetime.datetime.now()
 
