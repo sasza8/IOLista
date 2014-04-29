@@ -153,11 +153,12 @@ class DatabaseApi:
         DatabaseError jesli baza sie wywali
         WrongData jesli zostana podane bledne dane
         """
+        #TODO!!!!!!!!!!!!!!!!!!!!
 
         now = datetime.datetime.now()
 
         task_id = self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id,
-                                           created_at=now, name=name)
+                                              created_at=now, name=name)
         self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=1, can_edit=1)
         return task_id
 
@@ -174,6 +175,7 @@ class DatabaseApi:
         - <kolumna>__gt  - >
         - <kolumna>__gte - >=
         - <kolumna>      - =
+        - <kolumna>__neq - !=
         (
         (slownik == wiersz, etykiey jak w datase.py _names_)
         """
@@ -218,6 +220,7 @@ class DatabaseApi:
         """
         can_edit implikuje can_see
         """
+        #TODO!!!!!!!!!!!!!!!!!!!!!!!!
         if can_see == 0 and can_edit == 0:
             return
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
@@ -227,4 +230,5 @@ class DatabaseApi:
         if tmp:
             self._database_.update_access_and(c_task_id=task_id, c_user_id=user_id, can_see=can_see, can_edit=can_edit)
         else:
-            self._database_.insert_access(task_id=task_id, user_id=user_id, can_see)
+            self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=can_see)
+

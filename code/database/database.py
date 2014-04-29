@@ -71,9 +71,18 @@ class Condition:
             elif name.endswith(u"__gte"):
                 self._str_ += _names_[name[:-5]]
                 self._str_ += u">="
+            elif name.endswith(u"__neq"):
+                self._str_ += _names_[name[:-5]]
+                if value:
+                    self._str_ += u"!="
+                else:
+                    self._str_ += u" is not "
             else:
                 self._str_ += _names_[name]
-                self._str_ += u"="
+                if value:
+                    self._str_ += u"="
+                else:
+                    self._str_ += u" is "
             self._str_ += u"%(con" + unicode(self._counter_) + u")s"
             self._args_.update({u"con" + unicode(self._counter_): value})
             self._counter_ += 1
@@ -433,8 +442,7 @@ class Database:
 
         for name, value in kwargs.items():
             #columns.append(_names_[name])
-            if value is not None:
-                condition.AND(**{name: value})
+            condition.AND(**{name: value})
 
         if not condition.get_string():
             condition = None
