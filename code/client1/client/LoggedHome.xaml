@@ -20,8 +20,8 @@
             <TreeView.Resources>
                 <ContextMenu x:Key ="NodeContextMenu"  StaysOpen="true">
                     <MenuItem x:Name="menuItemAddNewSubtask" Header="Add new subtask" Click="menuItemAddNewSubtask_Click"/>
-                    <MenuItem x:Name="menuItemBBBB" Header="Add new subtask..."/>
-                    <MenuItem Header="Add..."/>
+                    <MenuItem x:Name="menuItemDeleteTask" Header="Delete task" Click="menuItemDeleteTask_Click"/>
+                    <MenuItem x:Name="menuItemChange" Header="Change task" Click="menuItemChange_Click"/>
                     <MenuItem Header="Add..."/>
                 </ContextMenu>
                 <ContextMenu x:Key ="RootMenu"  StaysOpen="true">

@@ -8,6 +8,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("serverpackets/textfile1.txt")]
+[assembly: System.Windows.Resources.AssemblyAssociatedContentFileAttribute("classes/readme.txt")]
 
 

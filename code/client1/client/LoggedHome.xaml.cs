@@ -27,7 +27,7 @@ namespace client
         private String token;
         private TcpClient client;
 
-        private UberTask uberTask;
+        //private List<Task> List<Task>;
         private TaskExplorer taskExplorer;
 
         public LoggedHome(string _username, string _token, TcpClient _client)
@@ -36,73 +36,60 @@ namespace client
             username = _username;
             token = _token;
             client = _client;
-            taskExplorer = new TaskExplorer(_client);
+            taskExplorer = new TaskExplorer(_client, _token);
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-            UberTask rootTasks = getChildren(-1);
+            List<Task> rootTasks = getChildren(-1);
             if(rootTasks != null)
                initTreeView(rootTasks);
+
+            // TESTY
+            Task t1 = new Task(); t1.name = "111";
+            TreeViewItem node = 
+                taskExplorer.addNewTaskToTreeView(t1, treeViewTaskExplorer);
+            Task t2 = new Task(); t2.name = "222";
+            TreeViewItem n1 =
+                taskExplorer.addNewSubtaskToTreeView(t2, node);
+            Task t3 = new Task(); t3.name = "333";
+            TreeViewItem n2 =
+                taskExplorer.addNewSubtaskToTreeView(t3, n1);
+            taskExplorer.addNewSubtaskToTreeView(t3, n2);
+            taskExplorer.addNewSubtaskToTreeView(t3, n2);
 
             addMenusToTreeExplorer();
         }
 
+        // TESTY TESTY TESTY
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
-            string response =
-                @"{
-                    'subtasks' :
-[
-{
-               'id' : '1',
-               'createOn': 'zisiaj',
-               'lastChange': 'mnute temu',
-               'done': 'False',
-               'parent': '1',
-               'description':  'opis',
-               'name' : 'posprzataj pokoj',
-               'subtasks' : [], 
-},
-{
-               'id' : '2',
-               'createOn': 'wczoraj',
-               'lastChange': 'mnute temu',
-               'done': 'True',
-               'parent': '1',
-               'description':  'blalblalbla opis',
-               'name' : 'name2',
-               'subtasks' : [], 
-},
-{
-               'id' : '3',
-               'createOn': 'zisiaj',
-               'lastChange': 'mnute temu',
-               'done': 'false',
-               'parent': '1',
-               'description':  'opis',
-               'name' : 'name3',
-               'subtasks' : [], 
-},
-],
-}";
-            uberTask = JsonConvert.DeserializeObject<UberTask>(response);
-            foreach(Task t in uberTask.subtasks)
-            {
-                //taskExplorer.addNewTask(t, treeViewTaskExplorer);
-            }
-            foreach (Object ob in treeViewTaskExplorer.Items)
-            {
-                TreeViewItem node = ob as TreeViewItem;
-                if(node != null)
-                {
-                    node.ContextMenu = treeViewTaskExplorer.Resources["NodeContextMenu"]
-                        as System.Windows.Controls.ContextMenu;
-                }
-            }
-            treeViewTaskExplorer.ContextMenu =
-                treeViewTaskExplorer.Resources["RootMenu"] 
-                as System.Windows.Controls.ContextMenu;
+            Packet p = new Packet();
+            p.type = Protocol.ADD_TASK;
+            p.parameters.Add("id", "mojeIDSUKO");
+            List<Task>  lista = new List<Task>();
+            Task t = new Task();
+            t.description = "KSKAKSAKSKAKSAKA opis opis";
+            lista.Add(t);
+            p.parameters.Add("subtasks", lista);
+            List<Task> listaZPOWROTEM = p.parameters["subtasks"] as List<Task>;
+            if (listaZPOWROTEM == null)
+                MessageBox.Show("listaZPOWROTEM null");
+            string json = JsonConvert.SerializeObject(p);
+            Console.WriteLine("{0}", json);
+           
+            Packet p2 = JsonConvert.DeserializeObject<Packet>(json);
+            Console.WriteLine("TEST: p2.params[subtasks].description");
+            //List<Task> l = p2.parameters["subtasks"] as List<Task>;
+            //Console.WriteLine("{0}", l[0].description);
+            //array.ToObject<List<SelectableEnumItem>>()
+            Newtonsoft.Json.Linq.JArray jsonArray = (Newtonsoft.Json.Linq.JArray)p2.parameters["subtasks"];
+            List<Task> l = jsonArray.ToObject<List<Task>>();
+            Console.WriteLine("{0}", l[0].description);
+
+            string json2 = JsonConvert.SerializeObject(p2);
+            Console.WriteLine("{0}", json2);
+
         }
 
         // ***************** PRIVATE FUNCTIONS ************ //
@@ -111,10 +98,10 @@ namespace client
         /// <summary>
         /// Initializes the treeView! adds all nodes
         /// </summary>
-        /// <param name="uberTask">root nodes!</param>
-        private void initTreeView(UberTask uberTask)
+        /// <param name="List<Task>">root nodes!</param>
+        private void initTreeView(List<Task> rootNodes)
         {
-            foreach(Task rootTask in uberTask.subtasks)
+            foreach(Task rootTask in rootNodes)
             {
                 TreeViewItem newRootNode = 
                     taskExplorer.addNewTaskToTreeView(rootTask, treeViewTaskExplorer);
@@ -129,10 +116,10 @@ namespace client
         /// <param name="parentId">parents id</param>
         private void addSubtasks(TreeViewItem parentNode, int parentId)
         {
-            UberTask children = getChildren(parentId);
+            List<Task> children = getChildren(parentId);
             if(children != null)
             {
-                foreach(Task subtask in children.subtasks)
+                foreach(Task subtask in children)
                 {
                     TreeViewItem subtaskNode = 
                         taskExplorer.addNewSubtaskToTreeView(subtask, parentNode);
@@ -143,19 +130,26 @@ namespace client
         }
 
         /// <summary>
-        /// Returns chidlren of a parent as a UberTask or null if sth wen wrong
+        /// Returns chidlren of a parent as a List<Task> or null if sth wen wrong
         /// </summary>
         /// <param name="parentId"> parents id, use -1 to get root nodes </param>
-        /// <returns></returns>
-        private UberTask getChildren(int parentId)
+        /// <returns> list of children </returns>
+        private List<Task> getChildren(int parentId)
         {
             try
             {
                 NetworkStream stream = client.GetStream();
-                string msg = Protocol.jsonSubtasks(parentId, token);
-                Protocol.sendToServer(stream, msg);
-                string response = Protocol.recieveFromServer(stream);
-                return JsonConvert.DeserializeObject<UberTask>(response);
+                Packet packet = Protocol.getPacketSubtasks(parentId, token);
+                Protocol.sendToServer(stream, packet);
+                Packet response = Protocol.recieveFromServer(stream);
+
+                // Changing p.parameters[subtasks] into List of Tasks
+                Newtonsoft.Json.Linq.JArray jsonArray =
+                    response.parameters["subtasks"] as Newtonsoft.Json.Linq.JArray;
+                
+                // we return null if cast failed, otherwise we change object into
+                // list of Tasks and return it
+                return jsonArray == null ? null : jsonArray.ToObject<List<Task>>();
             }
             catch (Exception)
             {
@@ -193,7 +187,7 @@ namespace client
             try
             {
                 taskExplorer.addNewTask(description, name,
-                    token, treeViewTaskExplorer);
+                     treeViewTaskExplorer);
             }
             catch(Exception)
             {
@@ -209,7 +203,7 @@ namespace client
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
                 if (parentNode != null)
                 {
-                    Console.WriteLine("Jestesmy w node");
+                    Console.WriteLine("Jestesmy w node: {0}", parentNode.Header.ToString());
                     Task task = parentNode.Tag as Task;
                     if (task != null)
                     {
@@ -218,7 +212,7 @@ namespace client
                             Interaction.InputBox("Choose the name of new task", "Name", "task");
                         string description =
                             Interaction.InputBox("Description of the task", "Description", "");
-                        taskExplorer.addNewSubTask(description, name, task.id, token, parentNode);
+                        taskExplorer.addNewSubTask(description, name, task.id,  parentNode);
                     }
                     else
                     {
@@ -233,6 +227,67 @@ namespace client
             {
                 MessageBox.Show("Opps! Something went wrong. Try again later!");
             }
+        }
+
+        // delete task
+        private void menuItemDeleteTask_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
+                if (parentNode != null)
+                {
+                    Console.WriteLine("Jestesmy w node: {0}", parentNode.Header.ToString());
+                    Task task = parentNode.Tag as Task;
+                    if (task != null)
+                    {
+                        Console.WriteLine("MAMY task! description: {0}", task.description);
+                        taskExplorer.deleteTask(parentNode);
+                        // TODO - mozliwe jeszcze ze przez referencje / inaczej to trzeba usuwac
+                    }
+                    else
+                    {
+                        MessageBox.Show("ERROR! Node nie ma Task w Tagu!!");
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Opps! Something went wrong. Try again later!");
+            }
+        }
+
+        // change task
+        private void menuItemChange_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
+                if (parentNode != null)
+                {
+                    Console.WriteLine("Jestesmy w node: {0}", parentNode.Header.ToString());
+                    Task task = parentNode.Tag as Task;
+                    if (task != null)
+                    {
+                        Console.WriteLine("MAMY task! description: {0}", task.description);
+                        string name =
+                            Interaction.InputBox("New Name", "Name", "task");
+                        string description =
+                            Interaction.InputBox("Description of the task", "Description", "");
+                        // TODO !! jeszcze 
+                        //taskExplorer.addNewSubTask(description, name, task.id,  parentNode);
+                    }
+                    else
+                    {
+                        MessageBox.Show("ERROR! Node nie ma Task w Tagu!!");
+                    }
+                }
+            }
+            catch(Exception)
+            {
+                MessageBox.Show("Opps! Something went wrong. Try again later!");
+            }
+        }
         }
 
     } // class

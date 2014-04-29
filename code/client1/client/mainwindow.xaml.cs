@@ -64,11 +64,11 @@ namespace client
             try
             {
                 NetworkStream stream = client.GetStream();
-                string json =
-                    Protocol.jsonAuthenticate(username, password);
+                Packet packet =
+                    Protocol.getPacketAuthenticate(username, password);
 
-                Protocol.sendToServer(stream, json);
-                string response = Protocol.recieveFromServer(stream);
+                Protocol.sendToServer(stream, packet);
+                Packet response = Protocol.recieveFromServer(stream);
                 checkAuthentication(username, response);
             }
             catch (Exception ex)
@@ -81,33 +81,24 @@ namespace client
         {
             //Register window = new Register(client);
             //window.Show();
+
             // TESTTT
-            string jsnTest = @"{
-                'type': '" + Protocol.LOGIN_OK + @"',
-                'token': 'blablablaTOKEN',
-            }";
-
-            Dictionary<String, String> d =
-                JsonConvert.DeserializeObject<Dictionary<String, String>>(jsnTest);
-
-            Console.WriteLine("Type: {0}", d["type"]);
-            checkAuthentication("Pablo", jsnTest);
+            Packet packetTest = new Packet();
+            packetTest.type = Protocol.LOGIN_OK;
+            packetTest.parameters.Add("token", "mojTokenik");
+            checkAuthentication("Pablo", packetTest);
         }
 
 
         // **                 PRIVATE FUNCTIONS             **/
         // ***************************************************/
 
-        private void checkAuthentication(String username, String serverResponse)
+        private void checkAuthentication(String username, Packet serverResponse)
         {
-            
-            // konwertujemy JSONa na klase Slownik
-            Dictionary<String, String> dictionary =
-                Protocol.jsonToDictionary(serverResponse);
-
-            if (dictionary["type"].Equals(Protocol.LOGIN_OK))
+            if (serverResponse.type.Equals(Protocol.LOGIN_OK))
             {
-                LoggedHome window = new LoggedHome(username, dictionary["token"], client);
+                LoggedHome window = new LoggedHome(username,
+                    (string) serverResponse.parameters["token"], client);
                 window.Show();
                 this.Close();
             }              

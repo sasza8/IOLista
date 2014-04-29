@@ -46,10 +46,10 @@ namespace client
             try 
             {
                 NetworkStream stream = client.GetStream();
-                string jsn = Protocol.jsonRegister(username, email, password);           
+                Packet packet = Protocol.getPacketRegister(username, email, password);           
 
-                Protocol.sendToServer(stream, jsn);
-                string response = Protocol.recieveFromServer(stream);
+                Protocol.sendToServer(stream, packet);
+                Packet response = Protocol.recieveFromServer(stream);
                 checkRegistration(response);
             }
             catch (Exception ex)
@@ -70,17 +70,15 @@ namespace client
             return true; 
         }
 
-        private void checkRegistration(String serverResponse)
+        private void checkRegistration(Packet serverResponse)
         {
-            Dictionary<String, String> dict =
-                Protocol.jsonToDictionary(serverResponse);
-            String type = dict["type"];
-            if(type.Equals(Protocol.REGISTER_OK))
+
+            if(serverResponse.type.Equals(Protocol.REGISTER_OK))
             {
                 // TODO
                 Console.WriteLine("Registation OK");
             }
-            else if(type.Equals(Protocol.REGISTER_FAILED))
+            else if (serverResponse.type.Equals(Protocol.REGISTER_FAILED))
             {
                 // TODO
                 Console.WriteLine("Registation FAILED");
