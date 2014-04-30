@@ -286,8 +286,7 @@ namespace client
             catch(Exception)
             {
                 MessageBox.Show("Opps! Something went wrong. Try again later!");
-            }
-        }
+            }       
         }
 
     } // class
