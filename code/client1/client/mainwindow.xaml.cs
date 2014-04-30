@@ -81,14 +81,8 @@ namespace client
 
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            //Register window = new Register(client);
-            //window.Show();
-
-            // TESTTT
-            PacketSTC packetTest = new PacketSTC();
-            packetTest.type = Protocol.LOGIN_OK;
-            packetTest.parameters.Add("authToken", "mojTokenik");
-            checkAuthentication("Pablo", packetTest);
+            Register window = new Register(client);
+            window.Show();
         }
 
 
@@ -113,48 +107,11 @@ namespace client
 
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
-//            string json = @"{
-//  'description': 'opis bla bla bla',
-//  'releaseDate': '1995-4-7T00:00:00',
-//    'lastModificationDate': '1995-4-7T00:00:00',
-//    'done' : 'False',
-//  'subTasks': [
-//{  'description': 'OPIS WEWNATRZ',
-//  'releaseDate': '1995-4-7T00:00:00',
-//    'lastModificationDate': '1995-4-7T00:00:00',
-//    'done' : 'False',
-//  'subTasks': []},
-//  ]
-//}";
-//            Task task =
-//                JsonConvert.DeserializeObject<Task>(json);
-//            Console.WriteLine("{0}", task.description);
-//                Console.WriteLine("{0}", task.createOn);
-//                Console.WriteLine("{0}", task.lastChange);
-//                Console.WriteLine("{0}", task.done);
-//                Console.WriteLine("{0}", task.subtasks[0].description);
-
-//                Task t = new Task();
-//                t.description = "test desc";
-//                t.lastChange = "jakasData";
-//                t.createOn = "innaData";
-//                t.done = true;
-//                    //t.subtasks = new Task[10];
-//                t.subtasks.Add(task);
-//                string jsonString = JsonConvert.SerializeObject(t);
-//                Console.WriteLine("{0}", jsonString);
-//                string json = @"{
-//'type' : 'loginOK',
-//'parameters' : {
-//    'subtasks' : [ { 'bla' : 'bla1',},
-//    {'bla' : 'bla2',}, ],
-//    'gruszka' : 'grucha',
-//    'jablko' : 'japco',
-//},
-//}";
-//                Dictionary<string, string> d = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-//               Console.WriteLine("type: {0}", d["type"]);
-//                Console.WriteLine("params[0]: {0}", d["parameters"]);
+            // TESTTT
+            PacketSTC packetTest = new PacketSTC();
+            packetTest.type = Protocol.LOGIN_OK;
+            packetTest.parameters.Add("authToken", "mojTokenik");
+            checkAuthentication("Pablo", packetTest);
         }
 
         private void btnPolaczZSerwerem_Click(object sender, RoutedEventArgs e)

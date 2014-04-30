@@ -56,6 +56,7 @@ namespace client
             {
                 // TODO
                 Console.WriteLine("Register exception : {0}", ex);
+                MessageBox.Show("Blad z polaczeniem z serwerem, internety zle dzialaja");
             }
         }
 
@@ -75,18 +76,14 @@ namespace client
 
             if(serverResponse.type.Equals(Protocol.REGISTER_OK))
             {
-                // TODO
                 Console.WriteLine("Registation OK");
+                MessageBox.Show("All went fine!");
+                this.Close();
             }
-            else if (serverResponse.type.Equals(Protocol.REGISTER_FAILED))
+            else
             {
-                // TODO
+                MessageBox.Show("Oopps, error");
                 Console.WriteLine("Registation FAILED");
-            }
-            else // zly pakiet!
-            {
-                // TODO
-                Console.WriteLine("Registation : WRONG PACKET");
             }
         }
 

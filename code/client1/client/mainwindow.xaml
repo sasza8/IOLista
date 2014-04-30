@@ -9,7 +9,7 @@
         <PasswordBox x:Name="passwordBox" HorizontalAlignment="Left" Margin="155,143,0,0" VerticalAlignment="Top" Height="23" Width="235"/>
         <Button x:Name="btnLogin" Content="Login" HorizontalAlignment="Left" Margin="155,195,0,0" VerticalAlignment="Top" Width="74" RenderTransformOrigin="0.033,-0.149" Height="23" Click="btnLogin_Click"/>
         <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Left" Margin="315,195,0,0" VerticalAlignment="Top" Width="75" Height="23" Click="btnRegister_Click"/>
-        <Button x:Name="btnTest" Content="TEST" HorizontalAlignment="Left" Margin="155,35,0,0" VerticalAlignment="Top" Width="75" Click="btnTest_Click"/>
+        <Button x:Name="btnTest" Content="zaloguj sie hakersko!" HorizontalAlignment="Left" Margin="155,35,0,0" VerticalAlignment="Top" Width="127" Click="btnTest_Click"/>
         <Button x:Name="btnPolaczZSerwerem" Content="POLACZ Z SERWEREM" HorizontalAlignment="Left" Margin="287,55,0,0" VerticalAlignment="Top" Width="154" Click="btnPolaczZSerwerem_Click"/>
 
     </Grid>
