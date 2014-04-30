@@ -459,3 +459,34 @@ class Database:
         sql += u" WHERE "
         sql += condition.get_string()
         sql += u";"
+        args = condition.get_arguments()
+        try:
+            conn = MySQLdb.connect(host=self._host_, user=self._user_, passwd=self._pass_, db=self._db_,
+                                   use_unicode=True, charset="utf8")
+        except _mysql_exceptions.OperationalError:
+            raise DBConnectionError()
+        except Exception as e:
+            raise DBError()
+
+        with conn:
+            cur = conn.cursor()
+            cur.execute("set names utf8;")
+            cur.executemany(sql, args)
+
+    def delete_access(self, **kwargs):
+        condition = Condition()
+        for name, value in kwargs.items():
+            condition.AND(**{name: value})
+        self.__DELETE__("have_access", condition)
+
+    def delete_task(self, **kwargs):
+        condition = Condition()
+        for name, value in kwargs.items():
+            condition.AND(**{name: value})
+        self.__DELETE__("tasks", condition)
+
+    def delete_user(self, **kwargs):
+        condition = Condition()
+        for name, value in kwargs.items():
+            condition.AND(**{name: value})
+        self.__DELETE__("tasks", condition)

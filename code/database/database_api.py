@@ -203,17 +203,18 @@ class DatabaseApi:
          (aktualnie ma)
         """
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
+        now = datetime.datetime.now()
         if tmp:
             if tmp[0]["can_edit"] == 1:
-                if parent_id != "":
+                if parent_id == "":
                     self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description, owner=owner,
-                                                     done=done)
+                                                     done=done, last_change=now)
                 elif parent_id is not None:
                     tmp = self._database_.select_access(task_id=parent_id, user_id=user_id)
                     if tmp:
                         if tmp[0]["can_edit"] == 1:
                             self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
-                                                             owner=owner, done=done, parent_id=parent_id)
+                                                             owner=owner, done=done, parent_id=parent_id, last_change=now)
                 else:
                     self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
                                                      owner=owner, done=done, parent_id=parent_id)
@@ -245,7 +246,7 @@ class DatabaseApi:
                 return True
         return False
 
-    def add_permission(self, task_id, user_id, can_see=1, can_edit=0):
+    def add_permission(self, actual_user, task_id, user_id, can_see=1, can_edit=0):
         """
         can_edit implikuje can_see
         powiedzmy ze user a tworzy liste A
@@ -255,13 +256,21 @@ class DatabaseApi:
         czy b powinien miec dostep do D (aktualnie nie ma)
         """
         #TODO!!!!!!!!!!!!!!!!!!!!!!!!
+        tmp = self._database_.select_access(task_id=task_id, user_id=actual_user)
+        if tmp[0]["can_edit"] == 0:
+            raise NoAccess()
 
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
         if can_edit == 1:
             can_see = 1
 
         if tmp:
-            self._database_.update_access_and(c__task_id=task_id, c__user_id=user_id, can_see=can_see, can_edit=can_edit)
+            if tmp[0]["can_see"] == can_see and tmp[0]["can_edit"] == can_edit:
+                return
+            if can_see:
+                self._database_.update_access_and(c__task_id=task_id, c__user_id=user_id, can_see=can_see, can_edit=can_edit)
+            else:
+                self.delete_permission(actual_user=actual_user, user_id=user_id, task_id=task_id)
         else:
             self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=can_see)
 
@@ -269,4 +278,14 @@ class DatabaseApi:
         for row in tmp:
             self.add_permission(task_id=row["task_id"], user_id=user_id, can_see=can_see,can_edit=can_edit)
 
+    def delete_permission(self, actual_user, user_id, task_id):
+        if self.can_edit(user_id=actual_user, task_id=task_id):
+            self._database_.delete_access(user_id=user_id, task_id=task_id)
 
+    def delete_task(self, actual_user, task_id):
+        if self.can_edit(user_id=actual_user, task_id=task_id):
+            self._database_.delete_access(task_id=task_id)
+            self._database_.delete_task(task_id=task_id)
+            tmp = self._database_.select_tasks(parent_id=task_id)
+            for row in tmp:
+                self.delete_task(actual_user, row["task_id"])
