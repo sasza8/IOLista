@@ -201,7 +201,7 @@ class DatabaseApi:
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
         if tmp:
             if tmp[0]["can_edit"] == 1:
-                self._database_.update_tasks_and(c_task_id=task_id, name=name, description=description, owner=owner,
+                self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description, owner=owner,
                                                  done=done, parent_id=parent_id)
 
     def can_edit(self, user_id, task_id):

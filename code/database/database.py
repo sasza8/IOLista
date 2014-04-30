@@ -381,7 +381,7 @@ class Database:
             if name.startswith("c__"):
                 name = name[3:]
                 condition.AND(**{name: value})
-            else:
+            elif value is not None:
                 set_vals.update({name: value})
 
         self.__UPDATE__(set_vals, u"tasks", condition)
