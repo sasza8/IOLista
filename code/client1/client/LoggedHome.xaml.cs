@@ -42,8 +42,10 @@ namespace client
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             List<Task> rootTasks = getChildren(-1);
-            if(rootTasks != null)
-               initTreeView(rootTasks);
+            if (rootTasks != null)
+                initTreeView(rootTasks);
+            else
+                MessageBox.Show("Brak zadan do pobrania");
 
             // TESTY
             Task t1 = new Task(); t1.name = "111";
@@ -146,6 +148,13 @@ namespace client
                 // Changing p.parameters[subtasks] into List of Tasks
                 Newtonsoft.Json.Linq.JArray jsonArray =
                     response.parameters["subtasks"] as Newtonsoft.Json.Linq.JArray;
+
+                string debugToServer = JsonConvert.SerializeObject(packet)
+                string debugFromServer = JsonConvert.SerializeObject(response);
+                Console.WriteLine("DEBUG DO POBRANIA DZIECI");
+                Console.WriteLine("TO SERVER: {0}" , debugToServer);
+                Console.WriteLine("FROM SERVER: {0}" , debugFromServer);
+
                 
                 // we return null if cast failed, otherwise we change object into
                 // list of Tasks and return it
