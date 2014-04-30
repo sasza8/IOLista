@@ -149,7 +149,7 @@ namespace client
                 Newtonsoft.Json.Linq.JArray jsonArray =
                     response.parameters["subtasks"] as Newtonsoft.Json.Linq.JArray;
 
-                string debugToServer = JsonConvert.SerializeObject(packet)
+                string debugToServer = JsonConvert.SerializeObject(packet);
                 string debugFromServer = JsonConvert.SerializeObject(response);
                 Console.WriteLine("DEBUG DO POBRANIA DZIECI");
                 Console.WriteLine("TO SERVER: {0}" , debugToServer);
