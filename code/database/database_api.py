@@ -187,7 +187,7 @@ class DatabaseApi:
         """
         return self._database_.select_tasks_user(user_id, can_see=1, **kwargs)
 
-    def update_task(self, user_id, task_id, name=None, description=None, owner=None, parent_id=None, done=None):
+    def update_task(self, user_id, task_id, name=None, description=None, owner=None, parent_id="", done=None):
         """
         aktualizuje taska o podanym id, zmienia tylko podane pola (gdy wszystko jest None nie robi nic)
         (zmiana parenta przenosi "folder")
@@ -201,8 +201,18 @@ class DatabaseApi:
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
         if tmp:
             if tmp[0]["can_edit"] == 1:
-                self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description, owner=owner,
-                                                 done=done, parent_id=parent_id)
+                if parent_id != "":
+                    self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description, owner=owner,
+                                                     done=done)
+                elif parent_id is not None:
+                    tmp = self._database_.select_access(task_id=parent_id, user_id=user_id)
+                    if tmp:
+                        if tmp[0]["can_edit"] == 1:
+                            self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
+                                                             owner=owner, done=done, parent_id=parent_id)
+                else:
+                    self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
+                                                     owner=owner, done=done, parent_id=parent_id)
 
     def can_edit(self, user_id, task_id):
         """

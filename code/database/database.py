@@ -448,3 +448,6 @@ class Database:
             condition = None
 
         return self.__SELECT__(columns, u'tasks INNER JOIN have_access ON tasks.TaskID = have_access.TaskID', condition)
+
+    # def __DELETE__(self, table_name, condition):
+    #     sql
