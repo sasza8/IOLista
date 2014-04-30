@@ -122,7 +122,7 @@ namespace client
                 // ArgumentOutOfRangeException - zly port
                 // SocketException
                 string hostname =
-                    Interaction.InputBox("HOSTNAME", "HOSTNAME", "localhost/127.0.0.1");
+                    Interaction.InputBox("HOSTNAME", "HOSTNAME", "89.76.253.114");
                 string porcik =
                     Interaction.InputBox("PORT", "PORT", "16661");
                 client = new TcpClient();

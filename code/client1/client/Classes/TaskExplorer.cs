@@ -42,7 +42,7 @@ namespace client
         /// throws exceptions if sth goes wrong
         /// </summary>
         /// <param name="description"></param>
-        public void addNewTask(string description,string name,
+        public TreeViewItem addNewTask(string description, string name,
              TreeView tree)
         {
             NetworkStream stream = client.GetStream();
@@ -50,7 +50,7 @@ namespace client
                 Protocol.getPacketAddTask(-1, description, authToken));
 
             PacketSTC response = Protocol.recieveFromServer(stream);
-            checkAddNewTask(response, description, name, tree);
+            return checkAddNewTask(response, description, name, tree);
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace client
         /// <param name="parentId"> parents id</param>
         /// <param name="authToken"></param>
         /// <param name="parentNode">parents node in treeView</param>
-        public void addNewSubTask(string description, string name, 
+        public TreeViewItem addNewSubTask(string description, string name, 
             int parentId,  TreeViewItem parentNode)
         {
             NetworkStream stream = client.GetStream();
@@ -70,7 +70,7 @@ namespace client
                 Protocol.getPacketAddTask(parentId, description, authToken));
 
             PacketSTC response = Protocol.recieveFromServer(stream);
-            checkAddNewSubtask(response, description, name, parentNode, parentId);
+            return checkAddNewSubtask(response, description, name, parentNode, parentId);
         }
 
 
@@ -113,7 +113,7 @@ namespace client
         // Check whether everything went OK
         // throw Exception if sth went wrong
 
-        private void checkAddNewTask(PacketSTC serverResponse, string description,
+        private TreeViewItem checkAddNewTask(PacketSTC serverResponse, string description,
             string name, TreeView tree)
         {
             if (serverResponse.type.Equals(Protocol.ADD_TASK_OK))
@@ -121,18 +121,19 @@ namespace client
                 Task newTask = getTask(Convert.ToInt32(serverResponse.parameters["id"]),
                     -1, name, description, (string) serverResponse.parameters["createdOn"]);
 
-                addNewTaskToTreeView(newTask, tree);
+                return addNewTaskToTreeView(newTask, tree);
             }
             else
             {
                 throw new couldNotAddNewTask();
+
             }
         }
 
         // like checkAddNewTask but invokes
         // different function inside:  addNewSubtaskToTreeView(newTask, parentNode)
         // It needs TreeViewItem instead of TreeView!
-        private void checkAddNewSubtask(PacketSTC serverResponse, string description,
+        private TreeViewItem checkAddNewSubtask(PacketSTC serverResponse, string description,
             string name, TreeViewItem parentNode, int parentId)
         {
             if (serverResponse.type.Equals(Protocol.ADD_TASK_OK))
@@ -140,7 +141,7 @@ namespace client
                 Task newTask = getTask(Convert.ToInt32(serverResponse.parameters["id"]), parentId,
                     name, description, (string) serverResponse.parameters["createdOn"]);
 
-                addNewSubtaskToTreeView(newTask, parentNode);
+                return addNewSubtaskToTreeView(newTask, parentNode);
             }
             else
             {

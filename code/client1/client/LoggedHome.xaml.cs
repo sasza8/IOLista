@@ -50,7 +50,8 @@ namespace client
                 MessageBox.Show("Brak zadan do pobrania");
 
             // TESTY
-            Task t1 = taskExplorer.getTask(1, -1, "111", "opis111", "dzisiaj");
+            Task t1 = taskExplorer.getTask(1, -1, "TEST",
+                "tego nie ma w bazie danych! tylko do testow na drzewku", "dzisiaj");
             TreeViewItem node = 
                 taskExplorer.addNewTaskToTreeView(t1, treeViewTaskExplorer);
             Task t2 = taskExplorer.getTask(2, 1, "222", "opis222", "dzisiaj");
@@ -147,23 +148,23 @@ namespace client
                 Protocol.sendToServer(stream, packet);
                 PacketSTC response = Protocol.recieveFromServer(stream);
 
-                // Changing p.parameters[subtasks] into List of Tasks
-                Newtonsoft.Json.Linq.JArray jsonArray =
-                    response.parameters["subtasks"] as Newtonsoft.Json.Linq.JArray;
-
                 string debugToServer = JsonConvert.SerializeObject(packet);
                 string debugFromServer = JsonConvert.SerializeObject(response);
                 Console.WriteLine("DEBUG DO POBRANIA DZIECI");
-                Console.WriteLine("TO SERVER: {0}" , debugToServer);
-                Console.WriteLine("FROM SERVER: {0}" , debugFromServer);
-                
+                Console.WriteLine("TO SERVER: {0}", debugToServer);
+                Console.WriteLine("FROM SERVER: {0}", debugFromServer);
+
+                // Changing p.parameters[subtasks] into List of Tasks
+                Newtonsoft.Json.Linq.JArray jsonArray =
+                    response.parameters["subtasks"] as Newtonsoft.Json.Linq.JArray;
+ 
                 // we return null if cast failed, otherwise we change object into
                 // list of Tasks and return it
                 return jsonArray == null ? null : jsonArray.ToObject<List<Task>>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                Console.WriteLine("ERROR in getChildren");
+                Console.WriteLine("ERROR in getChildren:" + ex.ToString());
                 return null;
             }
         }
@@ -200,8 +201,11 @@ namespace client
             Console.WriteLine("description : {0}", description);
             try
             {
-                taskExplorer.addNewTask(description, name,
+                TreeViewItem newNode = taskExplorer.addNewTask(description, name,
                      treeViewTaskExplorer);
+                if(newNode != null)
+                    newNode.ContextMenu = treeViewTaskExplorer.Resources["NodeContextMenu"]
+                        as System.Windows.Controls.ContextMenu;
             }
             catch(Exception)
             {
@@ -217,16 +221,20 @@ namespace client
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
                 if (parentNode != null)
                 {
-                    Console.WriteLine("Jestesmy w node: {0}", parentNode.Header.ToString());
+
                     Task task = parentNode.Tag as Task;
                     if (task != null)
                     {
-                        Console.WriteLine("MAMY task! description: {0}", task.description);
                         string name =
                             Interaction.InputBox("Choose the name of new task", "Name", "task");
                         string description =
                             Interaction.InputBox("Description of the task", "Description", "");
-                        taskExplorer.addNewSubTask(description, name, task.id,  parentNode);
+                        TreeViewItem newNode = 
+                            taskExplorer.addNewSubTask(description, name, task.id,  parentNode);
+
+                        if(newNode != null)
+                            newNode.ContextMenu = treeViewTaskExplorer.Resources["NodeContextMenu"]
+                                as System.Windows.Controls.ContextMenu;
                     }
                     else
                     {
