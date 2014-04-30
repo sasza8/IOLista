@@ -159,13 +159,16 @@ class DatabaseApi:
 
         task_id = self._database_.insert_task(description=description, owner=user_id, parent_id=parent_id,
                                               created_at=now, name=name)
+        add_access = True
         if parent_id is not None:
             tmp = self._database_.select_access(task_id=parent_id)
             for row in tmp:
                 self._database_.insert_access(task_id=task_id, user_id=row["user_id"], can_see=row["can_see"],
                                               can_edit=row["can_edit"])
-
-        self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=1, can_edit=1)
+                if row["user_id"] == user_id:
+                    add_access = False
+        if add_access:
+            self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=1, can_edit=1)
         return task_id
 
     def get_tasks(self, user_id, **kwargs):
@@ -185,6 +188,7 @@ class DatabaseApi:
         (
         (slownik == wiersz, etykiey jak w datase.py _names_)
         """
+        tmp = self._database_.select_tasks_user(user_id, can_see=1, **kwargs)
         return self._database_.select_tasks_user(user_id, can_see=1, **kwargs)
 
     def update_task(self, user_id, task_id, name=None, description=None, owner=None, parent_id="", done=None):
@@ -213,6 +217,11 @@ class DatabaseApi:
                 else:
                     self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
                                                      owner=owner, done=done, parent_id=parent_id)
+
+                if done: # rekurencyjne zakonczenie
+                    tmp = self._database_.select_tasks(parent_id=task_id)
+                    for row in tmp:
+                        self.update_task(user_id=user_id, task_id=row["task_id"], done=done)
 
     def can_edit(self, user_id, task_id):
         """
@@ -252,7 +261,7 @@ class DatabaseApi:
             can_see = 1
 
         if tmp:
-            self._database_.update_access_and(c_task_id=task_id, c_user_id=user_id, can_see=can_see, can_edit=can_edit)
+            self._database_.update_access_and(c__task_id=task_id, c__user_id=user_id, can_see=can_see, can_edit=can_edit)
         else:
             self._database_.insert_access(task_id=task_id, user_id=user_id, can_see=can_see)
 
