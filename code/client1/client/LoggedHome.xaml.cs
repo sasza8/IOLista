@@ -41,6 +41,12 @@ namespace client
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
+
+            Packet packet = Protocol.getPacketSubtasks(-1, authToken);
+            string debugToServer = JsonConvert.SerializeObject(packet);
+            Console.WriteLine("TO SERVER: {0}", debugToServer);
+
+
             List<Task> rootTasks = getChildren(-1);
             if (rootTasks != null)
                 initTreeView(rootTasks);
