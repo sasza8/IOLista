@@ -9,14 +9,12 @@ def connect():
 def test_register(username, password, firstname, lastname, email):
     sock = connect()
     data = dict()
-    params = dict()
+    parameters = dict()
     data['type'] = 'register'
-    params['username'] = username
-    params['password'] = password
-    params['firstname'] = firstname
-    params['lastname'] = lastname
-    params['email'] = email
-    data['params'] = params
+    parameters['username'] = username
+    parameters['password'] = password
+    parameters['email'] = email
+    data['parameters'] = parameters
     jsondata = json.dumps(data)
     sock.send(jsondata)
 
@@ -29,12 +27,12 @@ def test_authenticate(username, password):
     sock = connect()
 
     data = dict()
-    params = dict()
+    parameters = dict()
 
     data['type'] = 'authenticate'
-    params['username'] = username
-    params['password'] = password
-    data['params'] = params
+    parameters['username'] = username
+    parameters['password'] = password
+    data['parameters'] = parameters
 
     jsondata = json.dumps(data)
     sock.send(jsondata)
