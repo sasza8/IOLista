@@ -77,11 +77,11 @@ namespace client
         /// </summary>
         /// <param name="parent"> parents id. -1 to get root tasks</param>
         /// <returns></returns>
-        public static Packet getPacketSubtasks(int parent, string token)
+        public static Packet getPacketSubtasks(int parent, string authToken)
         {
             Packet p = new Packet();
             p.type = TASKS;
-            p.parameters.Add("token", token);
+            p.authToken = authToken;
             if( parent >= 0 )
                 p.parameters.Add("parent", parent);        
 
@@ -93,14 +93,14 @@ namespace client
         /// </summary>
         /// <param name="parent"> parents id, -1 when root</param>
         /// <param name="description"></param>
-        /// <param name="token"></param>
+        /// <param name="authToken"></param>
         /// <returns></returns>
         public static Packet getPacketAddTask(int parent, string description,
-            string token)
+            string authToken)
         {
             Packet p = new Packet();
             p.type = GET_TASKS;
-            p.parameters.Add("token", token);
+            p.authToken = authToken;
             p.parameters.Add("description", description);
             if(parent >= 0 )
                 p.parameters.Add("parent", parent);
@@ -112,13 +112,13 @@ namespace client
         /// 
         /// </summary>
         /// <param name="id"> id of task we want to delete </param>
-        /// <param name="token"></param>
+        /// <param name="authToken"></param>
         /// <returns></returns>
-        public static Packet getPacketDeleteTask(int id, string token)
+        public static Packet getPacketDeleteTask(int id, string authToken)
         {
             Packet p = new Packet();
             p.type = DELETE_TASK;
-            p.parameters.Add("token", token);
+            p.authToken = authToken;
             p.parameters.Add("id", id);
 
             return p;
@@ -133,9 +133,10 @@ namespace client
         /// <param name="description"></param>
         /// <returns></returns>
         public static Packet getPacketUpdateTask(int id, int parentId,
-            string name, string description)
+            string name, string description, string authToken)
         {
             Packet p = new Packet() { type = UPDATE_TASK };
+            p.authToken = authToken;
             p.parameters.Add("id", id);
             p.parameters.Add("parentId", parentId);
             p.parameters.Add("name", name);

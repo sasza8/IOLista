@@ -11,12 +11,12 @@ namespace client
     class TaskExplorer
     {
         private TcpClient client;
-        private string token;
+        private string authToken;
 
         public TaskExplorer(TcpClient _client, string _token)
         {
             client = _client;
-            token = _token;
+            authToken = _token;
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace client
 
             NetworkStream stream = client.GetStream();
             Protocol.sendToServer(stream,
-                Protocol.getPacketDeleteTask(task.id, token));
+                Protocol.getPacketDeleteTask(task.id, authToken));
             Packet response = Protocol.recieveFromServer(stream);
             checkDeleteTask(response, node);
         }
@@ -47,7 +47,7 @@ namespace client
         {
             NetworkStream stream = client.GetStream();
             Protocol.sendToServer(stream,
-                Protocol.getPacketAddTask(-1, description, token));
+                Protocol.getPacketAddTask(-1, description, authToken));
 
             Packet response = Protocol.recieveFromServer(stream);
             checkAddNewTask(response, description, name, tree);
@@ -60,14 +60,14 @@ namespace client
         /// <param name="description"></param>
         /// <param name="name"></param>
         /// <param name="parentId"> parents id</param>
-        /// <param name="token"></param>
+        /// <param name="authToken"></param>
         /// <param name="parentNode">parents node in treeView</param>
         public void addNewSubTask(string description, string name, 
             int parentId,  TreeViewItem parentNode)
         {
             NetworkStream stream = client.GetStream();
             Protocol.sendToServer(stream,
-                Protocol.getPacketAddTask(parentId, description, token));
+                Protocol.getPacketAddTask(parentId, description, authToken));
 
             Packet response = Protocol.recieveFromServer(stream);
             checkAddNewSubtask(response, description, name, parentNode, parentId);

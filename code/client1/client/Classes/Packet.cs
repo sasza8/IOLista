@@ -9,6 +9,7 @@ namespace client
     class Packet
     {
         public string type { get; set; }
+        public string authToken { get; set; }
         public Dictionary<string, object> parameters { get; set; }
 
         public Packet()

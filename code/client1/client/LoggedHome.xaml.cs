@@ -24,7 +24,7 @@ namespace client
     public partial class LoggedHome : Window
     {
         private String username;
-        private String token;
+        private String authToken;
         private TcpClient client;
 
         //private List<Task> List<Task>;
@@ -34,7 +34,7 @@ namespace client
         {
             InitializeComponent();
             username = _username;
-            token = _token;
+            authToken = _token;
             client = _client;
             taskExplorer = new TaskExplorer(_client, _token);
         }
@@ -139,7 +139,7 @@ namespace client
             try
             {
                 NetworkStream stream = client.GetStream();
-                Packet packet = Protocol.getPacketSubtasks(parentId, token);
+                Packet packet = Protocol.getPacketSubtasks(parentId, authToken);
                 Protocol.sendToServer(stream, packet);
                 Packet response = Protocol.recieveFromServer(stream);
 

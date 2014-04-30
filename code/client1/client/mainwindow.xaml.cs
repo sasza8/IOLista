@@ -87,7 +87,7 @@ namespace client
             // TESTTT
             Packet packetTest = new Packet();
             packetTest.type = Protocol.LOGIN_OK;
-            packetTest.parameters.Add("token", "mojTokenik");
+            packetTest.parameters.Add("authToken", "mojTokenik");
             checkAuthentication("Pablo", packetTest);
         }
 
@@ -95,12 +95,12 @@ namespace client
         // **                 PRIVATE FUNCTIONS             **/
         // ***************************************************/
 
-        private void checkAuthentication(String username, Packet serverResponse)
+        private void checkAuthentication(string username, Packet serverResponse)
         {
             if (serverResponse.type.Equals(Protocol.LOGIN_OK))
             {
                 LoggedHome window = new LoggedHome(username,
-                    (string) serverResponse.parameters["token"], client);
+                    (string) serverResponse.authToken, client);
                 window.Show();
                 this.Close();
             }              
