@@ -2,6 +2,7 @@
 from database import Database
 import database
 import datetime
+import sys
 """
 zostana dodane wyjatki tylko musze ogarnac jak sie je robi :P
 aktualnie ich nie obsluguje wiec wyjatki bazy moga latac jak porabane
@@ -210,6 +211,8 @@ class DatabaseApi:
                     self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description, owner=owner,
                                                      done=done, last_change=now)
                 elif parent_id is not None:
+                    if parent_id == task_id:
+                        raise WrongData()
                     tmp = self._database_.select_access(task_id=parent_id, user_id=user_id)
                     if tmp:
                         if tmp[0]["can_edit"] == 1:
