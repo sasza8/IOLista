@@ -47,7 +47,7 @@ namespace client
         {
             NetworkStream stream = client.GetStream();
             Protocol.sendToServer(stream,
-                Protocol.getPacketAddTask(-1, description, authToken));
+                Protocol.getPacketAddTask(-1, name, description, authToken));
 
             PacketSTC response = Protocol.recieveFromServer(stream);
             return checkAddNewTask(response, description, name, tree);
@@ -67,7 +67,7 @@ namespace client
         {
             NetworkStream stream = client.GetStream();
             Protocol.sendToServer(stream,
-                Protocol.getPacketAddTask(parentId, description, authToken));
+                Protocol.getPacketAddTask(parentId, name, description, authToken));
 
             PacketSTC response = Protocol.recieveFromServer(stream);
             return checkAddNewSubtask(response, description, name, parentNode, parentId);

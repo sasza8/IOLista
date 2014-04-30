@@ -83,8 +83,10 @@ class ServerProtocol(protocol.Protocol):
             parent = parameters.get('parent', None)
             task = self.serverLogic.addTask(user, name, description, parent)
             result['type'] = 'addTaskOK'
-            resParameters['id'] = task['id']
-            resParameters['createdOn'] = task['createdOn']
+            #resParameters['asdf']="ghij"
+            print task['task_id']
+            resParameters['id'] = task['task_id']
+            resParameters['createdOn'] = str(task['created_at'])
             result['parameters'] = resParameters
         except Exception as e:
             result = dict()

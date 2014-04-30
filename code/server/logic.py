@@ -30,7 +30,9 @@ class logicClass:
         return tasks
 
     def addTask(self, user, name, description, parent):
-        self.db_api.create_task(user_id=user, name=name, description=description, parent_id=parent)
+        id = self.db_api.create_task(user_id=user, name=name, description=description, parent_id=parent)
+        task = self.db_api.get_tasks(user_id=user, t_task_id=id)
+        return task[0]
 
     def getAuthenticatedUserId(self, token):
         user = self.authenticatedUsers.get(token)
