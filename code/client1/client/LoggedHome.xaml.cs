@@ -68,31 +68,31 @@ namespace client
         // TESTY TESTY TESTY
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
-            Packet p = new Packet();
-            p.type = Protocol.ADD_TASK;
-            p.parameters.Add("id", "mojeIDSUKO");
-            List<Task>  lista = new List<Task>();
-            Task t = new Task();
-            t.description = "KSKAKSAKSKAKSAKA opis opis";
-            lista.Add(t);
-            p.parameters.Add("subtasks", lista);
-            List<Task> listaZPOWROTEM = p.parameters["subtasks"] as List<Task>;
-            if (listaZPOWROTEM == null)
-                MessageBox.Show("listaZPOWROTEM null");
-            string json = JsonConvert.SerializeObject(p);
-            Console.WriteLine("{0}", json);
+            //Packet p = new Packet();
+            //p.type = Protocol.ADD_TASK;
+            //p.parameters.Add("id", "mojeIDSUKO");
+            //List<Task>  lista = new List<Task>();
+            //Task t = new Task();
+            //t.description = "KSKAKSAKSKAKSAKA opis opis";
+            //lista.Add(t);
+            //p.parameters.Add("subtasks", lista);
+            //List<Task> listaZPOWROTEM = p.parameters["subtasks"] as List<Task>;
+            //if (listaZPOWROTEM == null)
+            //    MessageBox.Show("listaZPOWROTEM null");
+            //string json = JsonConvert.SerializeObject(p);
+            //Console.WriteLine("{0}", json);
            
-            Packet p2 = JsonConvert.DeserializeObject<Packet>(json);
-            Console.WriteLine("TEST: p2.params[subtasks].description");
-            //List<Task> l = p2.parameters["subtasks"] as List<Task>;
+            //Packet p2 = JsonConvert.DeserializeObject<Packet>(json);
+            //Console.WriteLine("TEST: p2.params[subtasks].description");
+            ////List<Task> l = p2.parameters["subtasks"] as List<Task>;
+            ////Console.WriteLine("{0}", l[0].description);
+            ////array.ToObject<List<SelectableEnumItem>>()
+            //Newtonsoft.Json.Linq.JArray jsonArray = (Newtonsoft.Json.Linq.JArray)p2.parameters["subtasks"];
+            //List<Task> l = jsonArray.ToObject<List<Task>>();
             //Console.WriteLine("{0}", l[0].description);
-            //array.ToObject<List<SelectableEnumItem>>()
-            Newtonsoft.Json.Linq.JArray jsonArray = (Newtonsoft.Json.Linq.JArray)p2.parameters["subtasks"];
-            List<Task> l = jsonArray.ToObject<List<Task>>();
-            Console.WriteLine("{0}", l[0].description);
 
-            string json2 = JsonConvert.SerializeObject(p2);
-            Console.WriteLine("{0}", json2);
+            //string json2 = JsonConvert.SerializeObject(p2);
+            //Console.WriteLine("{0}", json2);
 
         }
 
@@ -143,9 +143,9 @@ namespace client
             try
             {
                 NetworkStream stream = client.GetStream();
-                Packet packet = Protocol.getPacketSubtasks(parentId, authToken);
+                PacketCTS packet = Protocol.getPacketSubtasks(parentId, authToken);
                 Protocol.sendToServer(stream, packet);
-                Packet response = Protocol.recieveFromServer(stream);
+                PacketSTC response = Protocol.recieveFromServer(stream);
 
                 // Changing p.parameters[subtasks] into List of Tasks
                 Newtonsoft.Json.Linq.JArray jsonArray =

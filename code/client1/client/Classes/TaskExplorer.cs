@@ -33,7 +33,7 @@ namespace client
             NetworkStream stream = client.GetStream();
             Protocol.sendToServer(stream,
                 Protocol.getPacketDeleteTask(task.id, authToken));
-            Packet response = Protocol.recieveFromServer(stream);
+            PacketSTC response = Protocol.recieveFromServer(stream);
             checkDeleteTask(response, node);
         }
 
@@ -49,7 +49,7 @@ namespace client
             Protocol.sendToServer(stream,
                 Protocol.getPacketAddTask(-1, description, authToken));
 
-            Packet response = Protocol.recieveFromServer(stream);
+            PacketSTC response = Protocol.recieveFromServer(stream);
             checkAddNewTask(response, description, name, tree);
         }
 
@@ -69,7 +69,7 @@ namespace client
             Protocol.sendToServer(stream,
                 Protocol.getPacketAddTask(parentId, description, authToken));
 
-            Packet response = Protocol.recieveFromServer(stream);
+            PacketSTC response = Protocol.recieveFromServer(stream);
             checkAddNewSubtask(response, description, name, parentNode, parentId);
         }
 
@@ -113,7 +113,7 @@ namespace client
         // Check whether everything went OK
         // throw Exception if sth went wrong
 
-        private void checkAddNewTask(Packet serverResponse, string description,
+        private void checkAddNewTask(PacketSTC serverResponse, string description,
             string name, TreeView tree)
         {
             if (serverResponse.type.Equals(Protocol.ADD_TASK_OK))
@@ -132,7 +132,7 @@ namespace client
         // like checkAddNewTask but invokes
         // different function inside:  addNewSubtaskToTreeView(newTask, parentNode)
         // It needs TreeViewItem instead of TreeView!
-        private void checkAddNewSubtask(Packet serverResponse, string description,
+        private void checkAddNewSubtask(PacketSTC serverResponse, string description,
             string name, TreeViewItem parentNode, int parentId)
         {
             if (serverResponse.type.Equals(Protocol.ADD_TASK_OK))
@@ -148,7 +148,7 @@ namespace client
             }
         }
 
-        private void checkDeleteTask(Packet serverResponse, TreeViewItem node)
+        private void checkDeleteTask(PacketSTC serverResponse, TreeViewItem node)
         {
             string type = serverResponse.type;
 

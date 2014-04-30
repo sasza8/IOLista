@@ -66,11 +66,11 @@ namespace client
             try
             {
                 NetworkStream stream = client.GetStream();
-                Packet packet =
+                PacketCTS packet =
                     Protocol.getPacketAuthenticate(username, password);
 
                 Protocol.sendToServer(stream, packet);
-                Packet response = Protocol.recieveFromServer(stream);
+                PacketSTC response = Protocol.recieveFromServer(stream);
                 checkAuthentication(username, response);
             }
             catch (Exception ex)
@@ -85,7 +85,7 @@ namespace client
             //window.Show();
 
             // TESTTT
-            Packet packetTest = new Packet();
+            PacketSTC packetTest = new PacketSTC();
             packetTest.type = Protocol.LOGIN_OK;
             packetTest.parameters.Add("authToken", "mojTokenik");
             checkAuthentication("Pablo", packetTest);
@@ -95,7 +95,7 @@ namespace client
         // **                 PRIVATE FUNCTIONS             **/
         // ***************************************************/
 
-        private void checkAuthentication(string username, Packet serverResponse)
+        private void checkAuthentication(string username, PacketSTC serverResponse)
         {
             if (serverResponse.type.Equals(Protocol.LOGIN_OK))
             {

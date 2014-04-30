@@ -50,9 +50,9 @@ namespace client
        
 
         // FUNCTIONS TO GET PACKETS
-        public static Packet getPacketAuthenticate(string username, string password)
+        public static PacketCTS getPacketAuthenticate(string username, string password)
         {
-            Packet p = new Packet();
+            PacketCTS p = new PacketCTS();
             p.type = AUTHENTICATE;
             p.parameters.Add("username", username);
             p.parameters.Add("password", password);
@@ -60,10 +60,10 @@ namespace client
             return p;
         }
 
-        public static Packet getPacketRegister(string username,
+        public static PacketCTS getPacketRegister(string username,
             string email, string password)
         {
-            Packet p = new Packet();
+            PacketCTS p = new PacketCTS();
             p.type = REGISTER;
             p.parameters.Add("username", username);
             p.parameters.Add("password", password);
@@ -77,9 +77,9 @@ namespace client
         /// </summary>
         /// <param name="parent"> parents id. -1 to get root tasks</param>
         /// <returns></returns>
-        public static Packet getPacketSubtasks(int parent, string authToken)
+        public static PacketCTS getPacketSubtasks(int parent, string authToken)
         {
-            Packet p = new Packet();
+            PacketCTS p = new PacketCTS();
             p.type = GET_TASKS;
             p.authToken = authToken;
             if( parent >= 0 )
@@ -95,10 +95,10 @@ namespace client
         /// <param name="description"></param>
         /// <param name="authToken"></param>
         /// <returns></returns>
-        public static Packet getPacketAddTask(int parent, string description,
+        public static PacketCTS getPacketAddTask(int parent, string description,
             string authToken)
         {
-            Packet p = new Packet();
+            PacketCTS p = new PacketCTS();
             p.type = ADD_TASK;
             p.authToken = authToken;
             p.parameters.Add("description", description);
@@ -114,9 +114,9 @@ namespace client
         /// <param name="id"> id of task we want to delete </param>
         /// <param name="authToken"></param>
         /// <returns></returns>
-        public static Packet getPacketDeleteTask(int id, string authToken)
+        public static PacketCTS getPacketDeleteTask(int id, string authToken)
         {
-            Packet p = new Packet();
+            PacketCTS p = new PacketCTS();
             p.type = DELETE_TASK;
             p.authToken = authToken;
             p.parameters.Add("id", id);
@@ -132,10 +132,10 @@ namespace client
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public static Packet getPacketUpdateTask(int id, int parentId,
+        public static PacketCTS getPacketUpdateTask(int id, int parentId,
             string name, string description, string authToken)
         {
-            Packet p = new Packet();
+            PacketCTS p = new PacketCTS();
             p.type = UPDATE_TASK;
             p.authToken = authToken;
             p.parameters.Add("id", id);
@@ -148,7 +148,7 @@ namespace client
 
 
         // SENDIND / RECIEVING
-        public static void sendToServer(NetworkStream stream, Packet packet)
+        public static void sendToServer(NetworkStream stream, PacketCTS packet)
         {
             string msg = JsonConvert.SerializeObject(packet);
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(msg);
@@ -156,14 +156,14 @@ namespace client
         }
         
         // returns json from serwer
-        public static Packet recieveFromServer(NetworkStream stream)
+        public static PacketSTC recieveFromServer(NetworkStream stream)
         {
             byte[] data = new byte[MAX_RECIEVED_MSG_LENGTH];
             // Read the first batch of the TcpServer response bytes.
             Int32 bytes = stream.Read(data, 0, data.Length);
             string json = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
 
-            return JsonConvert.DeserializeObject<Packet>(json);
+            return JsonConvert.DeserializeObject<PacketSTC>(json);
         }
 
     } // class

@@ -46,10 +46,10 @@ namespace client
             try 
             {
                 NetworkStream stream = client.GetStream();
-                Packet packet = Protocol.getPacketRegister(username, email, password);           
+                PacketCTS packet = Protocol.getPacketRegister(username, email, password);           
 
                 Protocol.sendToServer(stream, packet);
-                Packet response = Protocol.recieveFromServer(stream);
+                PacketSTC response = Protocol.recieveFromServer(stream);
                 checkRegistration(response);
             }
             catch (Exception ex)
@@ -70,7 +70,7 @@ namespace client
             return true; 
         }
 
-        private void checkRegistration(Packet serverResponse)
+        private void checkRegistration(PacketSTC serverResponse)
         {
 
             if(serverResponse.type.Equals(Protocol.REGISTER_OK))

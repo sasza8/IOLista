@@ -64,7 +64,8 @@
     <Compile Include="LoggedHome.xaml.cs">
       <DependentUpon>LoggedHome.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Classes\Packet.cs" />
+    <Compile Include="Classes\PacketCTS.cs" />
+    <Compile Include="Classes\PacketSTC.cs" />
     <Compile Include="Register.xaml.cs">
       <DependentUpon>Register.xaml</DependentUpon>
     </Compile>
