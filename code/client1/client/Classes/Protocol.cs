@@ -99,7 +99,7 @@ namespace client
             string authToken)
         {
             Packet p = new Packet();
-            p.type = GET_TASKS;
+            p.type = ADD_TASK;
             p.authToken = authToken;
             p.parameters.Add("description", description);
             if(parent >= 0 )
@@ -135,7 +135,8 @@ namespace client
         public static Packet getPacketUpdateTask(int id, int parentId,
             string name, string description, string authToken)
         {
-            Packet p = new Packet() { type = UPDATE_TASK };
+            Packet p = new Packet();
+            p.type = UPDATE_TASK;
             p.authToken = authToken;
             p.parameters.Add("id", id);
             p.parameters.Add("parentId", parentId);
