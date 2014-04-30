@@ -27,7 +27,6 @@ namespace client
         private String authToken;
         private TcpClient client;
 
-        //private List<Task> List<Task>;
         private TaskExplorer taskExplorer;
 
         public LoggedHome(string _username, string _token, TcpClient _client)
@@ -41,12 +40,9 @@ namespace client
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
-
-            Packet packet = Protocol.getPacketSubtasks(-1, authToken);
-            string debugToServer = JsonConvert.SerializeObject(packet);
-            Console.WriteLine("TO SERVER: {0}", debugToServer);
-
-
+            //Packet packet = Protocol.getPacketSubtasks(-1, authToken);
+            //string debugToServer = JsonConvert.SerializeObject(packet);
+            //Console.WriteLine("TO SERVER: {0}", debugToServer);
             List<Task> rootTasks = getChildren(-1);
             if (rootTasks != null)
                 initTreeView(rootTasks);
@@ -160,7 +156,6 @@ namespace client
                 Console.WriteLine("DEBUG DO POBRANIA DZIECI");
                 Console.WriteLine("TO SERVER: {0}" , debugToServer);
                 Console.WriteLine("FROM SERVER: {0}" , debugFromServer);
-
                 
                 // we return null if cast failed, otherwise we change object into
                 // list of Tasks and return it
@@ -183,6 +178,7 @@ namespace client
             foreach (Object ob in treeViewTaskExplorer.Items)
             {
                 TreeViewItem node = ob as TreeViewItem;
+                //node.items
                 if(node != null)
                 {
                     node.ContextMenu = treeViewTaskExplorer.Resources["NodeContextMenu"]
@@ -190,6 +186,9 @@ namespace client
                 }
             }
         }
+
+        // *********** POPUP MENU FUNCTIONS IN TREEVIEW *********** //
+        // ******************************************************** //
 
         // Adds a new root task
         private void menuItemAddNewTask1_Click(object sender, RoutedEventArgs e)

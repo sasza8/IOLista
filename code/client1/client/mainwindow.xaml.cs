@@ -99,8 +99,9 @@ namespace client
         {
             if (serverResponse.type.Equals(Protocol.LOGIN_OK))
             {
+                // Server sends us authToken as a attribute of params dictionary!
                 LoggedHome window = new LoggedHome(username,
-                    (string) serverResponse.authToken, client);
+                    (string) serverResponse.parameters["authToken"], client);
                 window.Show();
                 this.Close();
             }              
