@@ -203,17 +203,18 @@ class DatabaseApi:
          (aktualnie ma)
         """
         tmp = self._database_.select_access(task_id=task_id, user_id=user_id)
+        now = datetime.datetime.now()
         if tmp:
             if tmp[0]["can_edit"] == 1:
-                if parent_id != "":
+                if parent_id == "":
                     self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description, owner=owner,
-                                                     done=done)
+                                                     done=done, last_change=now)
                 elif parent_id is not None:
                     tmp = self._database_.select_access(task_id=parent_id, user_id=user_id)
                     if tmp:
                         if tmp[0]["can_edit"] == 1:
                             self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
-                                                             owner=owner, done=done, parent_id=parent_id)
+                                                             owner=owner, done=done, parent_id=parent_id, last_change=now)
                 else:
                     self._database_.update_tasks_and(c__task_id=task_id, name=name, description=description,
                                                      owner=owner, done=done, parent_id=parent_id)
