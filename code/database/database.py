@@ -10,6 +10,10 @@ _names_ zamienia uzywane identyfikatory na nazwy kolumn w bazie danych
 _inv_names_ jest odwroceniem _names_
 """
 
+_tables_ = dict(users=u"list.users",
+                tasks=u"list.tasks",
+                have_access=u"list.have_access")
+
 _names_ = dict(user_id=u"UserID",
                login=u"Login",
                password=u"Password",
@@ -448,3 +452,10 @@ class Database:
             condition = None
 
         return self.__SELECT__(columns, u'tasks INNER JOIN have_access ON tasks.TaskID = have_access.TaskID', condition)
+
+    def __DELETE__(self, table_name, condition):
+        sql = u"DELETE FROM "
+        sql += _tables_[table_name]
+        sql += u" WHERE "
+        sql += condition.get_string()
+        sql += u";"
