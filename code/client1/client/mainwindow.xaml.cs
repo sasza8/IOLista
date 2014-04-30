@@ -168,6 +168,8 @@ namespace client
                 string porcik =
                     Interaction.InputBox("PORT", "PORT", "16661");
                 client = new TcpClient();
+                Console.WriteLine("HOSTNAME: {0}", hostname);
+                Console.WriteLine("PORT: {0}", Convert.ToInt32(porcik));
                 client.Connect(hostname, Convert.ToInt32(porcik));
             }
             catch (Exception ex)
