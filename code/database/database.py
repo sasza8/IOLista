@@ -476,20 +476,17 @@ class Database:
     def delete_access(self, **kwargs):
         condition = Condition()
         for name, value in kwargs.items():
-            name = name[3:]
             condition.AND(**{name: value})
         self.__DELETE__("have_access", condition)
 
     def delete_task(self, **kwargs):
         condition = Condition()
         for name, value in kwargs.items():
-            name = name[3:]
             condition.AND(**{name: value})
         self.__DELETE__("tasks", condition)
 
     def delete_user(self, **kwargs):
         condition = Condition()
         for name, value in kwargs.items():
-            name = name[3:]
             condition.AND(**{name: value})
         self.__DELETE__("tasks", condition)
