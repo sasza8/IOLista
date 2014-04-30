@@ -92,7 +92,7 @@ namespace client
             return child;
         }
 
-        private Task getTask(int id, int parent, string name,
+        public Task getTask(int id, int parent, string name,
             string description, string createOn)
         {
             Task t = new Task();

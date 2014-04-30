@@ -50,13 +50,13 @@ namespace client
                 MessageBox.Show("Brak zadan do pobrania");
 
             // TESTY
-            Task t1 = new Task(); t1.name = "111";
+            Task t1 = taskExplorer.getTask(1, -1, "111", "opis111", "dzisiaj");
             TreeViewItem node = 
                 taskExplorer.addNewTaskToTreeView(t1, treeViewTaskExplorer);
-            Task t2 = new Task(); t2.name = "222";
+            Task t2 = taskExplorer.getTask(2, 1, "222", "opis222", "dzisiaj");
             TreeViewItem n1 =
                 taskExplorer.addNewSubtaskToTreeView(t2, node);
-            Task t3 = new Task(); t3.name = "333";
+            Task t3 = taskExplorer.getTask(3, 2, "333", "opis333", "dzisiaj");
             TreeViewItem n2 =
                 taskExplorer.addNewSubtaskToTreeView(t3, n1);
             taskExplorer.addNewSubtaskToTreeView(t3, n2);
@@ -246,16 +246,15 @@ namespace client
         // delete task
         private void menuItemDeleteTask_Click(object sender, RoutedEventArgs e)
         {
+            MessageBox.Show("TODO");
             try
             {
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
                 if (parentNode != null)
                 {
-                    Console.WriteLine("Jestesmy w node: {0}", parentNode.Header.ToString());
                     Task task = parentNode.Tag as Task;
                     if (task != null)
                     {
-                        Console.WriteLine("MAMY task! description: {0}", task.description);
                         taskExplorer.deleteTask(parentNode);
                         // TODO - mozliwe jeszcze ze przez referencje / inaczej to trzeba usuwac
                     }
@@ -274,6 +273,9 @@ namespace client
         // change task
         private void menuItemChange_Click(object sender, RoutedEventArgs e)
         {
+            MessageBox.Show("TODO");
+            return;
+
             try
             {
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
@@ -301,6 +303,21 @@ namespace client
             {
                 MessageBox.Show("Opps! Something went wrong. Try again later!");
             }       
+        }
+
+        // shows task
+        private void menuItemShowTask_Click(object sender, RoutedEventArgs e)
+        {
+            TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
+            if (parentNode != null)
+            {
+                Task task = parentNode.Tag as Task;
+                if (task != null)
+                {
+                    listViewTasks.Items.Clear();
+                    listViewTasks.Items.Add(task);
+                }
+            }
         }
 
     } // class
