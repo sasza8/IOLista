@@ -80,7 +80,7 @@ namespace client
         public static Packet getPacketSubtasks(int parent, string authToken)
         {
             Packet p = new Packet();
-            p.type = TASKS;
+            p.type = GET_TASKS;
             p.authToken = authToken;
             if( parent >= 0 )
                 p.parameters.Add("parent", parent);        
