@@ -51,7 +51,8 @@ namespace client
                 // FIXME
                 // tutaj ewentualne wyjscie z programu/ wlaczenie trybu offline
                 Console.WriteLine("SocketException / WrongPort : {0}", ex);
-                //MessageBox.Show("Nie udalo sie polaczyc z serwerem :(");
+                MessageBox.Show("Nie udalo sie polaczyc z serwerem :(");
+                MessageBox.Show("KOD BLEDU: " + ex.ToString());
             }
         }
 
