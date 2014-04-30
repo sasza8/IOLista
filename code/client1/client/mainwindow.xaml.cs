@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 
 // do testow
 using Newtonsoft.Json;
-
+using Microsoft.VisualBasic;
 
 namespace client
 {
@@ -39,21 +39,22 @@ namespace client
         // Nawiazujemy polaczenie z serverem. Gdy cos sie nie uda - wychodzimy
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {         
-            try
-            {
-                // ArgumentNullException - hostname null
-                // ArgumentOutOfRangeException - zly port
-                // SocketException
-                client = new TcpClient(HOSTNAME, PORT);
-            }
-            catch (Exception ex)
-            {
-                // FIXME
-                // tutaj ewentualne wyjscie z programu/ wlaczenie trybu offline
-                Console.WriteLine("SocketException / WrongPort : {0}", ex);
-                MessageBox.Show("Nie udalo sie polaczyc z serwerem :(");
-                MessageBox.Show("KOD BLEDU: " + ex.ToString());
-            }
+            //try
+            //{
+            //    // ArgumentNullException - hostname null
+            //    // ArgumentOutOfRangeException - zly port
+            //    // SocketException
+            //    client = new TcpClient();
+            //    client.Connect(HOSTNAME, PORT);
+            //}
+            //catch (Exception ex)
+            //{
+            //    // FIXME
+            //    // tutaj ewentualne wyjscie z programu/ wlaczenie trybu offline
+            //    Console.WriteLine("SocketException / WrongPort : {0}", ex);
+            //    MessageBox.Show("Nie udalo sie polaczyc z serwerem :(");
+            //    MessageBox.Show("KOD BLEDU: " + ex.ToString());
+            //}
         }
 
         private void btnLogin_Click(object sender, RoutedEventArgs e)
@@ -141,18 +142,42 @@ namespace client
 //                t.subtasks.Add(task);
 //                string jsonString = JsonConvert.SerializeObject(t);
 //                Console.WriteLine("{0}", jsonString);
-                string json = @"{
-'type' : 'loginOK',
-'parameters' : {
-    'subtasks' : [ { 'bla' : 'bla1',},
-    {'bla' : 'bla2',}, ],
-    'gruszka' : 'grucha',
-    'jablko' : 'japco',
-},
-}";
-                Dictionary<string, string> d = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-               Console.WriteLine("type: {0}", d["type"]);
-                Console.WriteLine("params[0]: {0}", d["parameters"]);
+//                string json = @"{
+//'type' : 'loginOK',
+//'parameters' : {
+//    'subtasks' : [ { 'bla' : 'bla1',},
+//    {'bla' : 'bla2',}, ],
+//    'gruszka' : 'grucha',
+//    'jablko' : 'japco',
+//},
+//}";
+//                Dictionary<string, string> d = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
+//               Console.WriteLine("type: {0}", d["type"]);
+//                Console.WriteLine("params[0]: {0}", d["parameters"]);
+        }
+
+        private void btnPolaczZSerwerem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                // ArgumentNullException - hostname null
+                // ArgumentOutOfRangeException - zly port
+                // SocketException
+                string hostname =
+                    Interaction.InputBox("HOSTNAME", "HOSTNAME", "localhost/127.0.0.1");
+                string porcik =
+                    Interaction.InputBox("PORT", "PORT", "16661");
+                client = new TcpClient();
+                client.Connect(hostname, Convert.ToInt32(porcik));
+            }
+            catch (Exception ex)
+            {
+                // FIXME
+                // tutaj ewentualne wyjscie z programu/ wlaczenie trybu offline
+                Console.WriteLine("SocketException / WrongPort : {0}", ex);
+                MessageBox.Show("Nie udalo sie polaczyc z serwerem :(");
+                MessageBox.Show("KOD BLEDU: " + ex.ToString());
+            }
         }
 
     } // window class
