@@ -111,7 +111,7 @@ namespace client
         // **************** CHECKING FUNCTIONS *********** //
         // *********************************************** //
         // Check whether everything went OK
-        // throw Exception if sth went wrong
+        // throws Exception if sth goes wrong
 
         private TreeViewItem checkAddNewTask(PacketSTC serverResponse, string description,
             string name, TreeView tree)
