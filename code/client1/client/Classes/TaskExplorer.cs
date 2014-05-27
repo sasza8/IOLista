@@ -24,7 +24,7 @@ namespace client
         /// throws exception if sth goes wrong
         /// </summary>
         /// <param name="node">node to delete</param>
-        public void deleteTask(TreeViewItem node)
+        public void deleteTask(TreeViewItem node, TreeView tree)
         {
             Task task = node.Tag as Task;
             if (task == null)  // every node should have Task tag!
@@ -34,7 +34,7 @@ namespace client
             Protocol.sendToServer(stream,
                 Protocol.getPacketDeleteTask(task.id, authToken));
             PacketSTC response = Protocol.recieveFromServer(stream);
-            checkDeleteTask(response, node);
+            checkDeleteTask(response, node, tree);
         }
 
         /// <summary>
@@ -71,6 +71,18 @@ namespace client
 
             PacketSTC response = Protocol.recieveFromServer(stream);
             return checkAddNewSubtask(response, description, name, parentNode, parentId);
+        }
+
+        public void updateTask(int id, int parentId, string description,
+            string name, TreeViewItem node)
+        {
+            Console.WriteLine("w update task explorer, przed wyslaniem do serwera");
+            NetworkStream stream = client.GetStream();
+            Protocol.sendToServer(stream,
+                Protocol.getPacketUpdateTask(id, parentId, name,
+                description, authToken));
+            PacketSTC response = Protocol.recieveFromServer(stream);
+            checkUpdateTask(response, name, description, node);
         }
 
 
@@ -149,13 +161,17 @@ namespace client
             }
         }
 
-        private void checkDeleteTask(PacketSTC serverResponse, TreeViewItem node)
+        private void checkDeleteTask(PacketSTC serverResponse, TreeViewItem node, TreeView tree)
         {
             string type = serverResponse.type;
 
             if(type.Equals(Protocol.DELETE_TASK_OK))
             {
-                //TreeViewItem.RemoveAt
+                tree.Items.Remove(node);
+                foreach (TreeViewItem item in tree.Items)
+                {
+                    deleteRecursive(item, node);
+                }
             }
             if (type.Equals(Protocol.DELETE_TASK_FAILED))
             {
@@ -169,6 +185,34 @@ namespace client
             {
                 //TODO
             }
+        }
+
+        private void deleteRecursive(TreeViewItem node, TreeViewItem nodeToDelete)
+        {
+            node.Items.Remove(nodeToDelete);
+            foreach (TreeViewItem n in node.Items)
+                deleteRecursive(n, nodeToDelete);
+        }
+
+        private void checkUpdateTask(PacketSTC serverResponse,
+            string name, string description, TreeViewItem node)
+        {
+            string type = serverResponse.type;
+            if( type == Protocol.UPDATE_TASK_OK )
+            {
+                Console.WriteLine("update task OK");
+                Task t = node.Tag as Task;
+                t.name = name;
+                t.description = description;
+                node.Header = t.name;
+                node.Tag = t;
+                
+            }
+            else
+            {
+                Console.WriteLine("update task FAILED");
+            }
+                
         }
     }
 }

@@ -69,6 +69,8 @@ namespace client
         // TESTY TESTY TESTY
         private void btnTest_Click(object sender, RoutedEventArgs e)
         {
+            treeViewTaskExplorer.Items.Remove(treeViewTaskExplorer.SelectedItem);
+            
             //Packet p = new Packet();
             //p.type = Protocol.ADD_TASK;
             //p.parameters.Add("id", "mojeIDSUKO");
@@ -254,7 +256,7 @@ namespace client
         // delete task
         private void menuItemDeleteTask_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("TODO");
+            //MessageBox.Show("TODO");
             try
             {
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
@@ -263,7 +265,10 @@ namespace client
                     Task task = parentNode.Tag as Task;
                     if (task != null)
                     {
-                        taskExplorer.deleteTask(parentNode);
+                        Console.WriteLine("Wchodzimy do treeviewExplorer - delete");
+                        Console.WriteLine(task.description, task.name);
+                        
+                        taskExplorer.deleteTask(parentNode, treeViewTaskExplorer);
                         // TODO - mozliwe jeszcze ze przez referencje / inaczej to trzeba usuwac
                     }
                     else
@@ -282,8 +287,6 @@ namespace client
         private void menuItemChange_Click(object sender, RoutedEventArgs e)
         {
             MessageBox.Show("TODO");
-            return;
-
             try
             {
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
@@ -293,13 +296,14 @@ namespace client
                     Task task = parentNode.Tag as Task;
                     if (task != null)
                     {
-                        Console.WriteLine("MAMY task! description: {0}", task.description);
+                        string defDescription = task.description;
+                        string defName = task.name;
+                        Console.WriteLine("MAMY task! description: {0}", defDescription);
                         string name =
-                            Interaction.InputBox("New Name", "Name", "task");
+                            Interaction.InputBox("New Name", "Name", defName);
                         string description =
-                            Interaction.InputBox("Description of the task", "Description", "");
-                        // TODO !! jeszcze 
-                        //taskExplorer.addNewSubTask(description, name, task.id,  parentNode);
+                            Interaction.InputBox("Description of the task", "Description", defDescription);
+                        taskExplorer.updateTask(task.id, task.parent, description, name, parentNode);
                     }
                     else
                     {
@@ -307,8 +311,9 @@ namespace client
                     }
                 }
             }
-            catch(Exception)
+            catch(Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 MessageBox.Show("Opps! Something went wrong. Try again later!");
             }       
         }
