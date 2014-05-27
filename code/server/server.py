@@ -83,7 +83,6 @@ class ServerProtocol(protocol.Protocol):
             parent = parameters.get('parent', None)
             task = self.serverLogic.addTask(user, name, description, parent)
             result['type'] = 'addTaskOK'
-            #resParameters['asdf']="ghij"
             print task['task_id']
             resParameters['id'] = task['task_id']
             resParameters['createdOn'] = str(task['created_at'])
@@ -103,8 +102,9 @@ class ServerProtocol(protocol.Protocol):
                 raise Exception
             parent = parameters.get('parent')
             name = parameters.get('name')
-            description = parameters.get('parent')
-            self.serverLogic.updateTask(user, id, parent, name, description)
+            description = parameters.get('description')
+            done = parameters.get('done')
+            self.serverLogic.updateTask(user, id, parent, name, description, done)
             result['type'] = 'updateTaskOK'
         except Exception:
             result = dict()
@@ -119,11 +119,32 @@ class ServerProtocol(protocol.Protocol):
             if id is None:
                 raise Exception
             self.serverLogic.deleteTask(user, id)
+            result['type'] = 'deleteTaskOK'
         except Exception:
             result = dict()
             result['type'] = 'deleteTaskFailed'
         finally:
             self.transport.write(json.dumps(result))
+
+    def do_changePrivileges(self, parameters, user):
+        try:
+            result = dict()
+            id = parameters.get('id')
+            if id is None:
+                raise Exception
+            user = parameters.get('user')
+            if user is None:
+                raise Exception
+            can_see = parameters.get('can_see')
+            can_edit = parameters.get('can_edit')
+            self.serverLogic.changePrivileges(id, user, can_see, can_edit)
+            result['type'] = 'changePrivilegesOK'
+        except Exception:
+            result = dict()
+            result['type'] = 'changePrivilegesFailed'
+        finally:
+            self.transport.write(json.dumps(result))
+
 
     def dataReceived(self, data):
         try:
@@ -152,6 +173,8 @@ class ServerProtocol(protocol.Protocol):
                     self.do_updateTask(parameters, user)
                 if requestType == 'deleteTask':
                     self.do_deleteTask(parameters, user)
+                if requestType == 'changePrivileges':
+                    self.do_addPrivileges(parameters, user)
 
         except self.LoginRequiredException:
             result = dict()

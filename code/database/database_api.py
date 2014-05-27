@@ -111,7 +111,7 @@ class DatabaseApi:
 
         return my_id
 
-    def get_user(self, login, password, email=None, user_id=None):
+    def get_user(self, login, password=None, email=None, user_id=None):
         """
         zwraca usera
         gdy podany email login moze byc none
@@ -132,14 +132,17 @@ class DatabaseApi:
         if not tmp:
             return None
 
-        my_pass = gen_hash(password=password, salt=tmp[0]["salt"])
-        if my_pass != tmp[0]["password"]:
-            raise WrongData()
-
         to_ret = dict(login=tmp[0]["login"],
                       password=tmp[0]["password"],
                       email=tmp[0]["email"],
                       user_id=tmp[0]["user_id"])
+
+        if password is None:
+            return to_ret
+
+        my_pass = gen_hash(password=password, salt=tmp[0]["salt"])
+        if my_pass != tmp[0]["password"]:
+            raise WrongData()
 
         return to_ret
 
