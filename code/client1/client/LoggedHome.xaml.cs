@@ -50,7 +50,7 @@ namespace client
                 MessageBox.Show("Brak zadan do pobrania");
 
             // TESTY
-            Task t1 = taskExplorer.getTask(1, -1, "TEST",
+            /*Task t1 = taskExplorer.getTask(1, -1, "TEST",
                 "tego nie ma w bazie danych! tylko do testow na drzewku", "dzisiaj");
             TreeViewItem node = 
                 taskExplorer.addNewTaskToTreeView(t1, treeViewTaskExplorer);
@@ -61,7 +61,7 @@ namespace client
             TreeViewItem n2 =
                 taskExplorer.addNewSubtaskToTreeView(t3, n1);
             taskExplorer.addNewSubtaskToTreeView(t3, n2);
-            taskExplorer.addNewSubtaskToTreeView(t3, n2);
+            taskExplorer.addNewSubtaskToTreeView(t3, n2);*/
 
             addMenusToTreeExplorer();
         }

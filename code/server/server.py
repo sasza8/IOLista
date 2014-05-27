@@ -9,30 +9,33 @@ class ServerProtocol(protocol.Protocol):
     class LoginRequiredException(Exception):
         pass
 
-    def do_authenticate(self, params):
+    def do_authenticate(self, parameters):
         try:
             result = dict()
-            username = params.get('username')
-            password = params.get('password')
+            resParameters = dict()
+            username = parameters.get('username')
+            password = parameters.get('password')
             token = self.serverLogic.authenticate(username, password)
             if token is None:
                 result['type'] = 'loginFailed'
             else:
                 result['type'] = 'loginOK'
-                result['authToken'] = token
-        except Exception:
+                resParameters['authToken'] = token
+                result['parameters'] = resParameters
+        except Exception as e:
             result = dict()
             result['type'] = 'authenticationFailed'
+            print e
         finally:
             self.transport.write(json.dumps(result))
 
-    def do_register(self, params):
+    def do_register(self, parameters):
         try:
             result = dict()
 
-            username = params.get('username')
-            password = params.get('password')
-            email = params.get('email')
+            username = parameters.get('username')
+            password = parameters.get('password')
+            email = parameters.get('email')
 
             if self.serverLogic.register(username, password, email):
                 result['type'] = 'registerOK'
@@ -44,55 +47,63 @@ class ServerProtocol(protocol.Protocol):
         finally:
             self.transport.write(json.dumps(result))
 
-    def do_getTasks(self, params, user):
+    def do_getTasks(self, parameters, user):
         try:
             result = dict()
-            parent = params.get('parent', None)
+            resParameters = dict()
+            parent = parameters.get('parent', None)
             tasks = self.serverLogic.getTasks(user, parent)
 
-            result['type'] = 'tasksList'
-            result['subtasks'] = []
+            result['type'] = 'tasks'
+            resParameters['subtasks'] = []
             for task in tasks:
                 subtask = dict()
                 subtask["id"] = task["task_id"]
+                subtask["name"] = task["name"]
                 subtask["description"] = task["description"]
-                subtask["parent"] = task["parent_id"]
+                subtask["parent"] = task["parent_id"] if task["parent_id"] is not None else -1
                 subtask["done"] = task["done"]
-                subtask["createdOn"] = task["created_at"]
-                subtask["lastChange"] = task["last_change"]
+                subtask["createdOn"] = str(task["created_at"])
+                subtask["lastChange"] = str(task["last_change"])
 
-                result['subtasks'].append(subtask)
+                resParameters['subtasks'].append(subtask)
+            result['parameters'] = resParameters
         except Exception:
             result = dict()
             result['type'] = 'getTasksFailed'
         finally:
             self.transport.write(json.dumps(result))
 
-    def do_addTask(self, params, user):
+    def do_addTask(self, parameters, user):
         try:
             result = dict()
-            name = params.get('name')
-            description = params.get('description')
-            parent = params.get('parent', None)
+            resParameters = dict()
+            name = parameters.get('name')
+            description = parameters.get('description')
+            parent = parameters.get('parent', None)
             task = self.serverLogic.addTask(user, name, description, parent)
             result['type'] = 'addTaskOK'
-            result['id'] = task['id']
-            result['craeatedOn'] = task['createdOn']
-        except Exception:
+            #resParameters['asdf']="ghij"
+            print task['task_id']
+            resParameters['id'] = task['task_id']
+            resParameters['createdOn'] = str(task['created_at'])
+            result['parameters'] = resParameters
+        except Exception as e:
             result = dict()
             result['type'] = 'addTaskFailed'
+            print e
         finally:
             self.transport.write(json.dumps(result))
 
-    def do_updateTask(self, params, user):
+    def do_updateTask(self, parameters, user):
         try:
             result = dict()
-            id = params.get('id')
+            id = parameters.get('id')
             if id is None:
                 raise Exception
-            parent = params.get('parent')
-            name = params.get('name')
-            description = params.get('parent')
+            parent = parameters.get('parent')
+            name = parameters.get('name')
+            description = parameters.get('parent')
             self.serverLogic.updateTask(user, id, parent, name, description)
             result['type'] = 'updateTaskOK'
         except Exception:
@@ -101,10 +112,10 @@ class ServerProtocol(protocol.Protocol):
         finally:
             self.transport.write(json.dumps(result))
 
-    def do_deleteTask(self, params, user):
+    def do_deleteTask(self, parameters, user):
         try:
             result = dict()
-            id = params.get('id')
+            id = parameters.get('id')
             if id is None:
                 raise Exception
             self.serverLogic.deleteTask(user, id)
@@ -118,15 +129,15 @@ class ServerProtocol(protocol.Protocol):
         try:
             jsonData = json.loads(data)
             requestType = jsonData.get('type')
-            params = jsonData.get('params')
+            parameters = jsonData.get('parameters')
             authToken = jsonData.get('authToken')
 
             print 'pakiet %s' % requestType
 
             if requestType == 'authenticate':
-                self.do_authenticate(params)
+                self.do_authenticate(parameters)
             elif requestType == 'register':
-                self.do_register(params)
+                self.do_register(parameters)
             else:
                 # pakiety wymagajace autoryzacji:
                 user = self.serverLogic.getAuthenticatedUserId(authToken)
@@ -134,13 +145,13 @@ class ServerProtocol(protocol.Protocol):
                     raise self.LoginRequiredException()
 
                 if requestType == 'getTasks':
-                    self.do_getTasks(params, user)
+                    self.do_getTasks(parameters, user)
                 if requestType == 'addTask':
-                    self.do_addTask(params, user)
+                    self.do_addTask(parameters, user)
                 if requestType == 'updateTask':
-                    self.do_updateTask(params, user)
+                    self.do_updateTask(parameters, user)
                 if requestType == 'deleteTask':
-                    self.do_deleteTask(params, user)
+                    self.do_deleteTask(parameters, user)
 
         except self.LoginRequiredException:
             result = dict()
@@ -148,8 +159,8 @@ class ServerProtocol(protocol.Protocol):
             self.transport.write(json.dumps(result))
         except Exception as e:
             print e
-        finally:
-            self.transport.loseConnection()
+        #finally:
+        #    self.transport.loseConnection()
 
 
 class ServerFactory(protocol.Factory):

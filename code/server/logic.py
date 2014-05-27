@@ -1,6 +1,6 @@
 import os
 import sys
-sys.path.append('../') # ustawiamy sciezke importu na folder code
+sys.path.append('..') # ustawiamy sciezke importu na folder code
 import database.database_api as database_api
 
 class logicClass:
@@ -30,7 +30,9 @@ class logicClass:
         return tasks
 
     def addTask(self, user, name, description, parent):
-        self.db_api.create_task(user_id=user, description=description, parent_id=parent)
+        id = self.db_api.create_task(user_id=user, name=name, description=description, parent_id=parent)
+        task = self.db_api.get_tasks(user_id=user, t_task_id=id)
+        return task[0]
 
     def getAuthenticatedUserId(self, token):
         user = self.authenticatedUsers.get(token)

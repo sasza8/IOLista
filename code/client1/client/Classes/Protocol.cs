@@ -95,12 +95,13 @@ namespace client
         /// <param name="description"></param>
         /// <param name="authToken"></param>
         /// <returns></returns>
-        public static PacketCTS getPacketAddTask(int parent, string description,
+        public static PacketCTS getPacketAddTask(int parent, string name, string description,
             string authToken)
         {
             PacketCTS p = new PacketCTS();
             p.type = ADD_TASK;
             p.authToken = authToken;
+            p.parameters.Add("name", name);
             p.parameters.Add("description", description);
             if(parent >= 0 )
                 p.parameters.Add("parent", parent);
