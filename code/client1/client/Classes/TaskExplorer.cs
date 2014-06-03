@@ -138,7 +138,6 @@ namespace client
             else
             {
                 throw new couldNotAddNewTask();
-
             }
         }
 
@@ -172,6 +171,10 @@ namespace client
                 {
                     deleteRecursive(item, node);
                 }
+            }
+            else
+            {
+                throw new Exception();
             }
             if (type.Equals(Protocol.DELETE_TASK_FAILED))
             {
@@ -211,6 +214,7 @@ namespace client
             else
             {
                 Console.WriteLine("update task FAILED");
+                throw new Exception();
             }
                 
         }

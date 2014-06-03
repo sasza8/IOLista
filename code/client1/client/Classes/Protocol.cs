@@ -17,7 +17,7 @@ namespace client
         // FIXME
         // CZY TA DLUGOSC NIE ZA MALA! JAK TO ZROBIC INACZEJ !?
         // uzywane w recieveFromServer(NetworkStream stream)
-        private const int MAX_RECIEVED_MSG_LENGTH = 4096; // in bytes
+        private const int MAX_RECIEVED_MSG_LENGTH = 6000; // in bytes
 
         // AUTHENTICATE
         public static string AUTHENTICATE = "authenticate";

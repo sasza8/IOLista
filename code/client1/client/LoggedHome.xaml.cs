@@ -197,7 +197,7 @@ namespace client
         private void menuItemAddNewTask1_Click(object sender, RoutedEventArgs e)
         {
             //MessageBox.Show("message", "caption");
-            string name = Interaction.InputBox("Choose the name of new task", "Name", "task");
+            string name = Interaction.InputBox("Choose the name of new task", "Name", "myNewTask");
             string description = Interaction.InputBox("Description of the task", "Description", "buy 3 beers");
             Console.WriteLine("name : {0}", name);
             Console.WriteLine("description : {0}", description);
@@ -256,7 +256,6 @@ namespace client
         // delete task
         private void menuItemDeleteTask_Click(object sender, RoutedEventArgs e)
         {
-            //MessageBox.Show("TODO");
             try
             {
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
@@ -286,7 +285,6 @@ namespace client
         // change task
         private void menuItemChange_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("TODO");
             try
             {
                 TreeViewItem parentNode = treeViewTaskExplorer.SelectedItem as TreeViewItem;
