@@ -34,6 +34,16 @@ class logicClass:
         task = self.db_api.get_tasks(user_id=user, t_task_id=id)
         return task[0]
 
+    def updateTask(self, user, id, parent, name, description, done):
+        self.db_api.update_task(user, id, name=name, description=description, done=done)
+
+    def deleteTask(self, user, id):
+        self.db_api.delete_task(user, id)
+
+    def changePrivileges(self, user, id, can_see, can_edit):
+        id = self.db_api.get_user(user)
+        self.db_api.add_permission
+
     def getAuthenticatedUserId(self, token):
         user = self.authenticatedUsers.get(token)
         return user
